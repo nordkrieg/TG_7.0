@@ -1,0 +1,406 @@
+User: n0rd_kr1eg
+Name: N0rd
+Surnameame: Kr1eg
+ID Chat: 1362885017
+Time: 06.09.2023 12:36:20
+Text: /info
+
+User: n0rd_kr1eg
+Name: N0rd
+Surnameame: Kr1eg
+ID Chat: 1362885017
+Time: 06.09.2023 12:37:00
+Text: /schedule_tomorrow
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:38:32
+Text: /start
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:38:57
+Text: /info
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:41:05
+Text: /news
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:41:12
+Text: /call_schedule
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:41:21
+Text: /schedule_today
+
+User: n0rd_kr1eg
+Name: N0rd
+Surnameame: Kr1eg
+ID Chat: 1362885017
+Time: 06.09.2023 12:41:30
+Text: /schedule_today
+
+User: n0rd_kr1eg
+Name: N0rd
+Surnameame: Kr1eg
+ID Chat: 1362885017
+Time: 06.09.2023 12:42:07
+Text: /news
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:42:14
+Text: /schedule_session
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:42:19
+Text: /capybara
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:42:29
+Text: /update
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:42:53
+Text: /future_updates
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:43:34
+Text: /support
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:43:43
+Text: /bugs
+
+User: donezer0
+Name: Дмитрий
+Surnameame: 
+ID Chat: 1358678174
+Time: 06.09.2023 12:46:02
+Text: /capybara
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:55:28
+Text: /start
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:55:55
+Text: /schedule_today
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:56:40
+Text: /call_schedule
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:57:19
+Text: /schedule_tomorrow
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:57:34
+Text: /schedule_session
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:57:38
+Text: /capybara
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:57:44
+Text: /capybara
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:57:59
+Text: /capybara
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:58:04
+Text: /capybara
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:58:22
+Text: /update
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:58:44
+Text: /news
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:59:00
+Text: /future_updates
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 12:59:30
+Text: /support
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:13:13
+Text: /start
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:13:34
+Text: /info
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:15:24
+Text: /call_schedule
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:15:39
+Text: /schedule_today
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:16:33
+Text: /schedule_tomorrow
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:16:47
+Text: /schedule_session
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:16:53
+Text: /capybara
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:17:04
+Text: /update
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:18:00
+Text: /future_updates
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:18:50
+Text: /support
+
+User: TALENTLESSNIKO
+Name: TalentlessNiko
+Surnameame: 
+ID Chat: 595981163
+Time: 06.09.2023 14:19:29
+Text: /news
+
+User: n0rd_kr1eg
+Name: N0rd
+Surnameame: Kr1eg
+ID Chat: 1362885017
+Time: 06.09.2023 17:25:30
+Text: /info_dev
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:26:37
+Text: /news
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:26:40
+Text: /schedule_today
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:26:48
+Text: /schedule_tomorrow
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:26:55
+Text: /schedule_today
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:26:59
+Text: /capybara
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:27:03
+Text: /capybara
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:27:13
+Text: /call_schedule
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:27:18
+Text: /schedule_tomorrow
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:27:27
+Text: /update
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:27:30
+Text: /bugs
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:27:37
+Text: /support
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:27:40
+Text: /schedule_tomorrow
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:27:46
+Text: /schedule_tomorrow
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:27:50
+Text: /news
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:27:53
+Text: /info
+
+User: vetrova_mar
+Name: Marina
+Surnameame: 
+ID Chat: 707667309
+Time: 06.09.2023 17:28:23
+Text: /capybara
+
+User: n0rd_kr1eg
+Name: N0rd
+Surnameame: Kr1eg
+ID Chat: 1362885017
+Time: 06.09.2023 18:10:14
+Text: /stop_test_tod
+
