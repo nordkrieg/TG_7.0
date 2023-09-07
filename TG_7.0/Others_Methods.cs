@@ -1,162 +1,78 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using ConvertApiDotNet;
-using Telegram.Bot.Types;
-using Telegram.Bot;
+﻿using ConvertApiDotNet;
 
-namespace TelegramBotFor3P_v0._1
+namespace TG_7._0
 {
-
-    public class Others_Methods
+    public class OthersMethods
     {
-        public static string version_bot = "v0.1";
-
-       
-        public static string sch_fold = "../../../Fold_data/sch_fold/";
-
-        public static string[] access_user = { "1362885017", "1358678174", "595981163", "707667309" };
-        public static long[] id_us = {1362885017, 1358678174, 595981163, 707667309};
-
-
-        public static string[] command = {"/start", "/info", "/news", "/call_schedule",
-            "/schedule_today", "/schedule_tomorrow", "/schedule_session", "/capybara", "/support",
-            "/update", "/techwork", "привет", "спасибо", "/debug", "/kill", "copy", "/future_updates", "/bugs", "/restart", "/teacher_list",
-            "/debugPath", "/custom_sch", "/stop_test", "/st_test", "/tech", "/return", "/stop_test_tod"};
+        protected static readonly string[] AccessUser = { "1362885017", "1358678174", "595981163", "707667309" };
+        protected static readonly long[] IdUs = { 1362885017, 1358678174, 595981163, 707667309 };
+        protected static readonly string[] Value = { "/start", "/info", "/news", "/call_schedule", "/schedule_today", "/schedule_tomorrow", "/schedule_session", "/capybara", "/support", "/update", "/techwork", "привет", "спасибо", "/debug", "/kill", "copy", "/future_updates", "/bugs", "/restart", "/teacher_list", "/debugPath", "/custom_sch", "/stop_test", "/st_test", "/tech", "/return", "/stop_test_tod" };
+        protected static string SchFold => "../../../Fold_data/sch_fold/";
 
         //checks the URL for existence
-        public static bool CheckURL(String url)
+        protected static async Task<bool> CheckUrl(string url)
         {
-            if (String.IsNullOrEmpty(url))
-                return false;
-
-            WebRequest request = WebRequest.Create(url);
+            using var client = new HttpClient();
             try
             {
-                HttpWebResponse res = request.GetResponse() as HttpWebResponse;
-
-                if (res.StatusDescription == "OK")
-                    return true;
+                var response = await client.GetAsync(url);
+                return response.IsSuccessStatusCode;
             }
-            catch
+            catch (HttpRequestException)
             {
+                return false;
             }
-            return false;
         }
+        /*//Check for Saturday
+         public static bool CheckDateSat(DateTime date)
+         {
+             return date.DayOfWeek.ToString() == "Saturday";
+         }
 
-
-        //checks the path for existence 
-        public static bool CheckPath(string path)
+         //Check for Sunday
+         public static bool CheckDateSun(DateTime date)
+         {
+             return date.DayOfWeek.ToString() == "Sunday";
+         }*/
+        protected static async Task DownLoad(string url, string path, DateTime date)
         {
-            FileInfo infopath = new FileInfo(path);
-
-            if (infopath.Exists ) 
-            {
-                return true;           
-            }
-            else return false;
-        }
-
-
-        //Check for Saturday
-        public static bool CheckDateSat(DateTime date)
-        {
-            if (date.DayOfWeek.ToString() == "Saturday")
-            {
-                return true;
-            } 
-            else return false;
-        }
-
-        //Check for Sunday
-        public static bool CheckDateSun(DateTime date)
-        {
-            if (date.DayOfWeek.ToString() == "Sunday")
-            {
-                return true;
-            }
-            else return false;
-        }
-
-        public static void DownLoad(string url, string path, DateTime date)
-        {
-            string day = date.DayOfYear.ToString();
-            string month = date.Month.ToString();
-            string year = date.Year.ToString();
-
+            var day = date.DayOfYear.ToString();
+            using var client = new HttpClient();
+            var month = date.Month.ToString();
             if (Convert.ToInt32(month) < 10)
-            {
-                month = "0" + month;
-            }
-
+                _ = "0" + month;
             if (day[0] == '0')
+                _ = day.TrimStart('0');
+            if (await CheckUrl(url))
             {
-                day = day.TrimStart('0');
-            }
-
-            using (var client = new WebClient())
-            {
-                if (CheckURL(url))
-                {
-                    //Console.WriteLine($"{CheckURL(url)}");
-                    client.DownloadFile(url, path);
-                    //Console.WriteLine($"{CheckURL(url)}");
-                }
-                else
-                {
-                    //Console.WriteLine($"{CheckURL(url)}");
-                }
+                var fileBytes = await client.GetByteArrayAsync(url);
+                await File.WriteAllBytesAsync(path, fileBytes);
             }
         }
-
-        public static async void ConvertFile(string path, DateTime date)
+        protected static async void ConvertFile(string path, DateTime date)
         {
-            string day = date.Day.ToString();
-            string month = date.Month.ToString();
-            string year = date.Year.ToString();
-
-            if (Convert.ToInt32(month) < 10)
-            {
-                month = "0" + month;
-            }
-         
-            if (day[0] == '0')
-            {
-                day = day.TrimStart('0');
-            }
-           
+            var day = date.Day.ToString();
+            var month = date.Month.ToString();
+            var year = date.Year.ToString();
+            if (Convert.ToInt32(month) < 10) month = "0" + month;
+            if (day[0] == '0') day = day.TrimStart('0');
             var convertApi = new ConvertApi("de94yzMvTMSKKeEc");
-            
             var convert = await convertApi.ConvertAsync("pdf", "jpg",
-                new ConvertApiFileParam("File", @$"{path}{day}.{month}.{year}.pdf")
+                new ConvertApiFileParam("File", $"{path}{day}.{month}.{year}.pdf")
             );
             await convert.SaveFilesAsync(path);
         }
 
-        public static void DeletePDF()
+        protected static void DeletePdf()
         {
-            string[] pdfList = Directory.GetFiles(sch_fold, "*.pdf");
-            foreach (string f in pdfList)
+            var pdfList = Directory.GetFiles(SchFold, "*.pdf");
+            foreach (var f in pdfList)
             {
-                System.IO.File.Delete(f);
+                File.Delete(f);
             }
         }
-
-
-
     }
 }
-
-
-
-
-
-
-
-
-
-
-
 /*
     000000000000000000000000000000000000000000000000000000000000
     0000000000+++++++00000000+00000000+00000000000+++++++00000000000000
@@ -184,14 +100,4 @@ namespace TelegramBotFor3P_v0._1
     000000000000000000000000000000000000000000000000000000000000
     000000000000000000000000000000000000000000000000000000000000
     000000000000000000000000000000000000000000000000000000000000
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
  */
