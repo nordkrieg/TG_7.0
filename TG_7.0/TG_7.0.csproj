@@ -9,7 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="ConvertApi" Version="3.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="telegram.bot" Version="19.0.0" />
+    
   </ItemGroup>
 
   <ItemGroup>
