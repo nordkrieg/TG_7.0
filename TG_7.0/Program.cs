@@ -1,13 +1,16 @@
-﻿using Telegram.Bot;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Microsoft.Extensions.Hosting;
+
 
 namespace TG_7._0
 {
     internal abstract class Program : OthersMethods
     {
         private static string _month, _day;
-        private static void Main()
+        private static async Task Main()
         {
             var botClient = new TelegramBotClient("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
             botClient.StartReceiving(Update, Error);
@@ -30,7 +33,18 @@ namespace TG_7._0
             Console.WriteLine();
             Console.WriteLine(string.Concat(Enumerable.Repeat("-", 120)));
             Console.WriteLine();
-            Console.ReadLine();
+            var waiter = new ManualResetEventSlim(false);
+            waiter.Wait();
+            //Console.ReadLine();
+            /*var hostBuilder = new HostBuilder()
+            .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddHostedService<Service>();
+                }
+            );
+
+        await hostBuilder.RunConsoleAsync().ConfigureAwait(false);*/
+
         }
         private static async Task Update(ITelegramBotClient botClient, Update update, CancellationToken token)
         {
@@ -89,6 +103,8 @@ namespace TG_7._0
                                 _month = "0" + _month;
                             if (_day[0] == '0')
                                 _day = _day.TrimStart('0');
+                            Console.WriteLine("месяц . " + _month);
+                            Console.WriteLine("месяц но день  " + _day);
                             if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg"))
                             {
                                 if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
@@ -143,7 +159,8 @@ namespace TG_7._0
                             else
                             {
                                 if (!exFile)
-                                    await botClient.SendTextMessageAsync(message.Chat.Id, $"Расписания на {DateTime.Now.ToShortDateString()} нет", cancellationToken: token);
+                                    Console.WriteLine("я думаю что сегодня   " + DateTime.Now.ToShortDateString());
+                                await botClient.SendTextMessageAsync(message.Chat.Id, $"Расписания на {DateTime.Now.ToShortDateString()} нет", cancellationToken: token);
                             }
                             DeletePdf();
                             break;
@@ -293,4 +310,21 @@ namespace TG_7._0
         }
         private static Task Error(ITelegramBotClient client, Exception exception, CancellationToken token) => throw new NotImplementedException();
     }
+    /*public class Service : IHostedService
+    {
+        public Service()
+        {
+            //ss
+        }
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            Console.WriteLine("Task is started.");
+            return Task.CompletedTask;
+        }
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            Console.WriteLine("Task stopped.");
+            return Task.CompletedTask;
+        }
+    }*/
 }
