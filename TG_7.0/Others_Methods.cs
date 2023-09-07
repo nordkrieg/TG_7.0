@@ -4,12 +4,10 @@ namespace TG_7._0
 {
     public class OthersMethods
     {
-        protected static readonly string[] AccessUser = { "1362885017", "1358678174", "595981163", "707667309" };
-        protected static readonly long[] IdUs = { 1362885017, 1358678174, 595981163, 707667309 };
+        protected static readonly string[] AccessUser = { "1362885017", "1358678174", "595981163", "707667309", "1079037911" };
+        //protected static readonly long[] IdUs = { 1362885017, 1358678174, 595981163, 707667309 };
         protected static readonly string[] Value = { "/start", "/info", "/news", "/call_schedule", "/schedule_today", "/schedule_tomorrow", "/schedule_session", "/capybara", "/support", "/update", "/techwork", "привет", "спасибо", "/debug", "/kill", "copy", "/future_updates", "/bugs", "/restart", "/teacher_list", "/debugPath", "/custom_sch", "/stop_test", "/st_test", "/tech", "/return", "/stop_test_tod" };
         protected static string SchFold => "../../../Fold_data/sch_fold/";
-
-        //checks the URL for existence
         protected static async Task<bool> CheckUrl(string url)
         {
             using var client = new HttpClient();
@@ -62,7 +60,6 @@ namespace TG_7._0
             );
             await convert.SaveFilesAsync(path);
         }
-
         protected static void DeletePdf()
         {
             var pdfList = Directory.GetFiles(SchFold, "*.pdf");

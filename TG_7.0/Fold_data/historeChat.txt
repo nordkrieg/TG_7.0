@@ -733,3 +733,31 @@ ID Chat: 1362885017
 Time: 07.09.2023 19:21:45
 Text: /schedule_session
 
+User: n0rd_kr1eg
+Name: N0rd
+Surnameame: Kr1eg
+ID Chat: 1362885017
+Time: 07.09.2023 20:09:33
+Text: /teacher_list
+
+User: hydra00000
+Name: ­
+Surnameame: 
+ID Chat: 1079037911
+Time: 07.09.2023 20:14:56
+Text: /start
+
+User: hydra00000
+Name: ­
+Surnameame: 
+ID Chat: 1079037911
+Time: 07.09.2023 20:14:59
+Text: /info
+
+User: n0rd_kr1eg
+Name: N0rd
+Surnameame: Kr1eg
+ID Chat: 1362885017
+Time: 07.09.2023 20:16:08
+Text: /info
+

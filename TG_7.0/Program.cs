@@ -18,12 +18,11 @@ namespace TG_7._0
             Console.Write(string.Concat(Enumerable.Repeat("\t", 2)));
             Console.WriteLine("All information is in the telegram channel: https://t.me/lesson_assistant_backstage !");
             Console.WriteLine(string.Concat(Enumerable.Repeat("-", 120)));
-            Console.WriteLine("Setting:"); 
+            Console.WriteLine("Setting:");
             Console.WriteLine("Bot Version v0.9");
             Console.WriteLine($"Getting started: {DateTime.Now}");
             Console.WriteLine($"Name PC: {System.Net.Dns.GetHostName()}");
             Console.WriteLine($"Name User PC: {Environment.UserName}");
-
             Console.WriteLine();
             Console.WriteLine(string.Concat(Enumerable.Repeat("-", 120)));
             Console.WriteLine();
@@ -33,12 +32,10 @@ namespace TG_7._0
             Console.WriteLine();
             Console.ReadLine();
         }
-
-        //Update message from Users  
         private static async Task Update(ITelegramBotClient botClient, Update update, CancellationToken token)
         {
             var message = update.Message;
-            if (message is { Text: not null } && AccessUser.Contains(Convert.ToString( message.Chat.Id)))
+            if (message is { Text: not null } && AccessUser.Contains(Convert.ToString(message.Chat.Id)))
             {
                 Console.WriteLine($"User: {message.Chat.Username}");
                 Console.WriteLine($"Name: {message.Chat.FirstName}");
@@ -47,7 +44,6 @@ namespace TG_7._0
                 Console.WriteLine($"Time: {DateTime.Now}");
                 Console.WriteLine($"Text: {message.Text}");
                 Console.WriteLine();
-
                 await System.IO.File.AppendAllTextAsync("../../../Fold_data/historeChat.txt", $"User: {message.Chat.Username}", token);
                 await System.IO.File.AppendAllTextAsync("../../../Fold_data/historeChat.txt", $"\nName: {message.Chat.FirstName}", token);
                 await System.IO.File.AppendAllTextAsync("../../../Fold_data/historeChat.txt", $"\nSurnameame: {message.Chat.LastName}", token);
@@ -56,16 +52,9 @@ namespace TG_7._0
                 await System.IO.File.AppendAllTextAsync("../../../Fold_data/historeChat.txt", $"\nText: {message.Text}", token);
                 await System.IO.File.AppendAllTextAsync("../../../Fold_data/historeChat.txt", "\n\n", token);
 
-                if (Value.Contains(message.Text.ToLower()) == false && message.Text.ToLower().Contains("!sc") == false)
-                {
-                    await botClient.SendTextMessageAsync(message.Chat.Id, "Неверная команда!", cancellationToken: token);
-                }
-
                 if (message.Text.ToLower() == "/start")
-                {
                     await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromUri("https://sun9-33.userapi.com/impg/ryNcRmoOZGUm-_faB4kaVQV4ywo-3BL2R2GFVg/jlav8UuJ7Us.jpg?size=430x178&quality=95&sign=17941b56a7056aa8549bb8765cfaa472&type=album"),
                         caption: "Добро пожаловать!\n\nДля пользования ботом советую прочитать сводку команд, использовав /info в меню", cancellationToken: token);
-                }
                 switch (message.Text.ToLower())
                 {
                     case "/start" when AccessUser.Contains(Convert.ToString(message.Chat.Id)):
@@ -92,151 +81,149 @@ namespace TG_7._0
                             }, cancellationToken: token);
                         break;
                     case "/schedule_today":
-                    {
-                        var exFile = false;
-                        _month = DateTime.Now.Month.ToString();
-                        _day = DateTime.Now.Day.ToString();
-                        if (Convert.ToInt32(_month) < 10)
-                            _month = "0" + _month;
-
-                        if (_day[0] == '0')
-                            _day = _day.TrimStart('0');
-
-                        if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg"))
                         {
-                            if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
+                            var exFile = false;
+                            _month = DateTime.Now.Month.ToString();
+                            _day = DateTime.Now.Day.ToString();
+                            if (Convert.ToInt32(_month) < 10)
+                                _month = "0" + _month;
+                            if (_day[0] == '0')
+                                _day = _day.TrimStart('0');
+                            if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg"))
                             {
-                                exFile = true;
-                                await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
-                                await using Stream stream2 = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg");
-                                await botClient.SendMediaGroupAsync(message.Chat.Id,
-                                    media: new IAlbumInputMedia[]
-                                    {
+                                if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
+                                {
+                                    exFile = true;
+                                    await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
+                                    await using Stream stream2 = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg");
+                                    await botClient.SendMediaGroupAsync(message.Chat.Id,
+                                        media: new IAlbumInputMedia[]
+                                        {
                                         new InputMediaPhoto(
                                             InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg")),
                                         new InputMediaPhoto(
                                             InputFile.FromStream(stream2, $"{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
-                                    }, cancellationToken: token);
-                            }
+                                        }, cancellationToken: token);
+                                }
 
-                            if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && exFile == false)
-                            {
-                                exFile = true;
-                                await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
-                                await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg"), cancellationToken: token);
+                                if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && exFile == false)
+                                {
+                                    exFile = true;
+                                    await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
+                                    await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg"), cancellationToken: token);
+                                }
                             }
-                        }
-                        var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{DateTime.Now.Year}/{_month}/{_day}.{_month}.{DateTime.Now.Year}.pdf");
-                        if (urlCheckResult != true && exFile == false)
-                        {
-                            await DownLoad($"https://mkeiit.ru/wp-content/uploads/{DateTime.Now.Year}/{_month}/{_day}.{_month}.{DateTime.Now.Year}.pdf", $"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.pdf", DateTime.Now);
-                            ConvertFile(SchFold, DateTime.Now);
-                            Thread.Sleep(1500);
-                            if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
+                            var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{DateTime.Now.Year}/{_month}/{_day}.{_month}.{DateTime.Now.Year}.pdf");
+                            if (urlCheckResult != true && exFile == false)
                             {
-                                exFile=true;
-                                await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
-                                await using Stream stream2 = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg");
-                                await botClient.SendMediaGroupAsync(message.Chat.Id,
-                                    media: new IAlbumInputMedia[]
-                                    {
+                                await DownLoad($"https://mkeiit.ru/wp-content/uploads/{DateTime.Now.Year}/{_month}/{_day}.{_month}.{DateTime.Now.Year}.pdf", $"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.pdf", DateTime.Now);
+                                ConvertFile(SchFold, DateTime.Now);
+                                Thread.Sleep(1500);
+                                if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
+                                {
+                                    exFile = true;
+                                    await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
+                                    await using Stream stream2 = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg");
+                                    await botClient.SendMediaGroupAsync(message.Chat.Id,
+                                        media: new IAlbumInputMedia[]
+                                        {
                                         new InputMediaPhoto(
                                             InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg")),
                                         new InputMediaPhoto(
                                             InputFile.FromStream(stream2, $"{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
-                                    }, cancellationToken: token);
-                            }
+                                        }, cancellationToken: token);
+                                }
 
-                            if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && !exFile)
-                            {
-                                await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
-                                await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg"), cancellationToken: token);
+                                if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && !exFile)
+                                {
+                                    await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
+                                    await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg"), cancellationToken: token);
+                                }
                             }
+                            else
+                            {
+                                if (!exFile)
+                                    await botClient.SendTextMessageAsync(message.Chat.Id, $"Расписания на {DateTime.Now.ToShortDateString()} нет", cancellationToken: token);
+                            }
+                            DeletePdf();
+                            break;
                         }
-                        else
-                        {
-                            if (!exFile)
-                                await botClient.SendTextMessageAsync(message.Chat.Id, $"Расписания на {DateTime.Now.ToShortDateString()} нет", cancellationToken: token);
-                        }
-                        DeletePdf();
-                        break;
-                    }
                     case "/schedule_tomorrow":
-                    {
-                        var exFile = false;
-                        _month = DateTime.Now.AddDays(1).Month.ToString();
-                        _day = DateTime.Now.AddDays(1).Day.ToString();
-                        if (Convert.ToInt32(_month) < 10)
-                            _month = "0" + _month;
-                        if (_day[0] == '0')
-                            _day = _day.TrimStart('0');
-                        if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg"))
                         {
-                            if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
+                            var exFile = false;
+                            _month = DateTime.Now.AddDays(1).Month.ToString();
+                            _day = DateTime.Now.AddDays(1).Day.ToString();
+                            if (Convert.ToInt32(_month) < 10)
+                                _month = "0" + _month;
+                            if (_day[0] == '0')
+                                _day = _day.TrimStart('0');
+                            if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg"))
                             {
-                                exFile = true;
-                                await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
-                                await using Stream stream2 = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg");
-                                await botClient.SendMediaGroupAsync(message.Chat.Id,
-                                    media: new IAlbumInputMedia[]
-                                    {
+                                if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
+                                {
+                                    exFile = true;
+                                    await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
+                                    await using Stream stream2 = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg");
+                                    await botClient.SendMediaGroupAsync(message.Chat.Id,
+                                        media: new IAlbumInputMedia[]
+                                        {
                                         new InputMediaPhoto(
                                             InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg")),
                                         new InputMediaPhoto(
                                             InputFile.FromStream(stream2, $"{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
-                                    }, cancellationToken: token);
+                                        }, cancellationToken: token);
+                                }
+                                if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && exFile == false)
+                                {
+                                    exFile = true;
+                                    await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
+                                    await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg"), cancellationToken: token);
+                                }
                             }
-                            if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && exFile == false)
+                            var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{DateTime.Now.Year}/{_month}/{_day}.{_month}.{DateTime.Now.Year}.pdf");
+                            if (urlCheckResult && exFile == false)
                             {
-                                exFile = true;
-                                await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
-                                await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg"), cancellationToken: token);
-                            }
-                        }
-                        var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{DateTime.Now.Year}/{_month}/{_day}.{_month}.{DateTime.Now.Year}.pdf");
-                        if (urlCheckResult && exFile == false)
-                        {
-                            await DownLoad($"https://mkeiit.ru/wp-content/uploads/{DateTime.Now.Year}/{_month}/{_day}.{_month}.{DateTime.Now.Year}.pdf", $"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.pdf", DateTime.Now);
-                            ConvertFile($"{SchFold}", DateTime.Now.AddDays(1));
-                            Thread.Sleep(2000);
-                            if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
-                            {
-                                exFile = true;
-                                await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
-                                await using Stream stream2 = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg");
-                                await botClient.SendMediaGroupAsync(message.Chat.Id,
-                                    media: new IAlbumInputMedia[]
-                                    {
+                                await DownLoad($"https://mkeiit.ru/wp-content/uploads/{DateTime.Now.Year}/{_month}/{_day}.{_month}.{DateTime.Now.Year}.pdf", $"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.pdf", DateTime.Now);
+                                ConvertFile($"{SchFold}", DateTime.Now.AddDays(1));
+                                Thread.Sleep(2000);
+                                if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
+                                {
+                                    exFile = true;
+                                    await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
+                                    await using Stream stream2 = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}-2.jpg");
+                                    await botClient.SendMediaGroupAsync(message.Chat.Id,
+                                        media: new IAlbumInputMedia[]
+                                        {
                                         new InputMediaPhoto(
                                             InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg")),
                                         new InputMediaPhoto(
                                             InputFile.FromStream(stream2, $"{_day}.{_month}.{DateTime.Now.Year}-2.jpg"))
-                                    }, cancellationToken: token);
+                                        }, cancellationToken: token);
+                                }
+                                if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && exFile == false)
+                                {
+                                    await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
+                                    await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg"), cancellationToken: token);
+                                }
                             }
-                            if (System.IO.File.Exists($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg") && exFile == false)
+                            else
                             {
-                                await using Stream stream = System.IO.File.OpenRead($"{SchFold}{_day}.{_month}.{DateTime.Now.Year}.jpg");
-                                await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromStream(stream, $"{_day}.{_month}.{DateTime.Now.Year}.jpg"), cancellationToken: token);
+                                if (!exFile)
+                                    await botClient.SendTextMessageAsync(message.Chat.Id, $"Расписания на {DateTime.Now.AddDays(1).ToShortDateString()} нет", cancellationToken: token);
                             }
+                            DeletePdf();
+                            break;
                         }
-                        else
-                        {
-                            if (!exFile)
-                                await botClient.SendTextMessageAsync(message.Chat.Id, $"Расписания на {DateTime.Now.AddDays(1).ToShortDateString()} нет", cancellationToken: token);
-                        }
-                        DeletePdf();
-                        break;
-                    }
                     case "/capybara":
-                    {
-                        var x = new Random();
-                        var rand = x.Next(1, 45);
-                        var link = System.IO.File.ReadLines("../../../Fold_data/LinkCapybara.txt").ElementAtOrDefault(rand);
-                        if (link != null)
-                            await botClient.SendPhotoAsync(chatId: message.Chat.Id,
-                                photo: InputFile.FromUri(link), caption: $"{rand}/45", cancellationToken: token);
-                        break;
-                    }
+                        {
+                            var x = new Random();
+                            var rand = x.Next(1, 45);
+                            var link = System.IO.File.ReadLines("../../../Fold_data/LinkCapybara.txt").ElementAtOrDefault(rand);
+                            if (link != null)
+                                await botClient.SendPhotoAsync(chatId: message.Chat.Id,
+                                    photo: InputFile.FromUri(link), caption: $"{rand}/45", cancellationToken: token);
+                            break;
+                        }
                     case "/support":
                         await botClient.SendTextMessageAsync(message.Chat.Id, "Поддержать разработчика: \n\n" +
                                                                               "СберБанк: `5469 4100 1429 4908`\n" +
@@ -260,55 +247,50 @@ namespace TG_7._0
                     case "/teacher_list":
                         await botClient.SendTextMessageAsync(message.Chat.Id, "В разработке...", cancellationToken: token);
                         break;
-                }
-
-
-                if (message.Text == "/stop_test")
-                    for (int i = 0; i < 4; i++)
-                    {
-                        await botClient.SendPhotoAsync(IdUs[i], 
-                            photo: InputFile.FromUri("http://s00.yaplakal.com/pics/pics_original/4/0/8/17305804.jpg"),
-                            caption: "Дорогой тестировщик! Благодарю за участие в закрытом бета-тестировании бота! Ваши результаты помогут уладить ошибки, и продвинут бота к выходу в релиз! До новых встреч..!", cancellationToken: token);
-                    }
-
-                switch(message.Text)
-                {
-                    case "/st_test":
-                        for (int i = 0; i < 4; i++)
+                    case "/stop_test":
+                        for (var i = 0; i < 5; i++)
                         {
-                            await botClient.SendTextMessageAsync(IdUs[i], "Доброе утро, тестировщик! Напоминаю, что сегодняшнее тестирование началось, и продлится до 19 часов!", cancellationToken: token);
+                            await botClient.SendPhotoAsync(AccessUser[i],
+                                photo: InputFile.FromUri("http://s00.yaplakal.com/pics/pics_original/4/0/8/17305804.jpg"),
+                                caption: "Дорогой тестировщик! Благодарю за участие в закрытом бета-тестировании бота! Ваши результаты помогут уладить ошибки, и продвинут бота к выходу в релиз! До новых встреч..!", cancellationToken: token);
+                        }
+                        break;
+                    case "/st_test":
+                        for (var i = 0; i < 5; i++)
+                        {
+                            await botClient.SendTextMessageAsync(AccessUser[i], "Доброе утро, тестировщик! Напоминаю, что сегодняшнее тестирование началось, и продлится до 19 часов!", cancellationToken: token);
                         }
                         break;
                     case "/stop_test_tod":
-                        for (int i = 0; i < 4; i++)
+                        for (var i = 0; i < 5; i++)
                         {
-                            await botClient.SendTextMessageAsync(IdUs[i], "Тестирование на сегодня окончено. Не забудьте сообщить разработчику о результатах тестирования. До завтра!", cancellationToken: token);
+                            await botClient.SendTextMessageAsync(AccessUser[i], "Тестирование на сегодня окончено. Не забудьте сообщить разработчику о результатах тестирования. До завтра!", cancellationToken: token);
                         }
                         break;
                     case "/tech":
-                        for (int i = 0; i < 4; i++)
+                        for (var i = 0; i < 5; i++)
                         {
-                            await botClient.SendTextMessageAsync(IdUs[i], "Тестирование временно приостановленно. Ожидайте.", cancellationToken: token);
+                            await botClient.SendTextMessageAsync(AccessUser[i], "Тестирование временно приостановленно. Ожидайте.", cancellationToken: token);
                         }
                         break;
                     case "/return":
-                        for (int i = 0; i < 4; i++)
+                        for (var i = 0; i < 5; i++) 
                         {
-                            await botClient.SendTextMessageAsync(IdUs[i], "Тестирование возобновлено! Можете продолжать работать!", cancellationToken: token);
+                            await botClient.SendTextMessageAsync(AccessUser[i], "Тестирование возобновлено! Можете продолжать работать!", cancellationToken: token);
                         }
                         break;
-
+                    case "/info_dev":
+                        await botClient.SendTextMessageAsync(message.Chat.Id, await System.IO.File.ReadAllTextAsync("../../../Fold_data/infodev.txt", token), cancellationToken: token);
+                        break;
+                    default:
+                        await botClient.SendTextMessageAsync(message.Chat.Id, "Неверная команда!",
+                            cancellationToken: token);
+                        break;
                 }
-
-                if (message.Text == "/info_dev")
-                    await botClient.SendTextMessageAsync(message.Chat.Id, await System.IO.File.ReadAllTextAsync("../../../Fold_data/infodev.txt", token), cancellationToken: token);                
             }
             else if (message != null)
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Доступ запрещен!", cancellationToken: token);
         }
-        private static Task Error(ITelegramBotClient client, Exception exception, CancellationToken token)
-        {
-            throw new NotImplementedException();
-        }
+        private static Task Error(ITelegramBotClient client, Exception exception, CancellationToken token) => throw new NotImplementedException();
     }
 }
