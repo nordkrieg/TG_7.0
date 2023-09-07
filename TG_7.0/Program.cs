@@ -8,6 +8,7 @@ namespace TG_7._0
     {
         private static string _month, _day;
         private static void Main()
+        static void Main(string[] args)
         {
             var botClient = new TelegramBotClient("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
             botClient.StartReceiving(Update, Error);
@@ -23,6 +24,7 @@ namespace TG_7._0
             Console.WriteLine($"Getting started: {DateTime.Now}");
             Console.WriteLine($"Name PC: {System.Net.Dns.GetHostName()}");
             Console.WriteLine($"Name User PC: {Environment.UserName}");
+
             Console.WriteLine();
             Console.WriteLine(string.Concat(Enumerable.Repeat("-", 120)));
             Console.WriteLine();
