@@ -263,58 +263,18 @@ namespace TG_7._0
                     case "/teacher_list":
                         await botClient.SendTextMessageAsync(message.Chat.Id, "В разработке...", cancellationToken: token);
                         break;
-                    case "/stop_test":
-                        for (var i = 0; i < 5; i++)
-                        {
-                            await botClient.SendPhotoAsync(AccessUser[i],
-                                photo: InputFile.FromUri("http://s00.yaplakal.com/pics/pics_original/4/0/8/17305804.jpg"),
-                                caption: "Дорогой тестировщик! Благодарю за участие в закрытом бета-тестировании бота! Ваши результаты помогут уладить ошибки, и продвинут бота к выходу в релиз! До новых встреч..!", cancellationToken: token);
-                        }
-                        break;
-                    case "/st_test":
-                        for (var i = 0; i < 5; i++)
-                        {
-                            await botClient.SendTextMessageAsync(AccessUser[i], "Доброе утро, тестировщик! Напоминаю, что сегодняшнее тестирование началось, и продлится до 19 часов!", cancellationToken: token);
-                        }
-                        break;
-                    case "/stop_test_tod":
-                        for (var i = 0; i < 5; i++)
-                        {
-                            await botClient.SendTextMessageAsync(AccessUser[i], "Тестирование на сегодня окончено. Не забудьте сообщить разработчику о результатах тестирования. До завтра!", cancellationToken: token);
-                        }
-                        break;
-                    case "/tech":
-                        for (var i = 0; i < 5; i++)
-                        {
-                            await botClient.SendTextMessageAsync(AccessUser[i], "Тестирование временно приостановленно. Ожидайте.", cancellationToken: token);
-                        }
-                        break;
-                    case "/return":
-                        for (var i = 0; i < 5; i++) 
-                        {
-                            await botClient.SendTextMessageAsync(AccessUser[i], "Тестирование возобновлено! Можете продолжать работать!", cancellationToken: token);
-                        }
-                        break;
-                    case "/info_dev":
-                        await botClient.SendTextMessageAsync(message.Chat.Id, await System.IO.File.ReadAllTextAsync("../../../Fold_data/infodev.txt", token), cancellationToken: token);
-                        break;
                     default:
                         await botClient.SendTextMessageAsync(message.Chat.Id, "Неверная команда!",
                             cancellationToken: token);
                         break;
                 }
             }
-            else if (message != null)
-                await botClient.SendTextMessageAsync(message.Chat.Id, "Доступ запрещен!", cancellationToken: token);
         }
         private static Task Error(ITelegramBotClient client, Exception exception, CancellationToken token) => throw new NotImplementedException();
     }
     public class Service : IHostedService
     {
-        public Service()
-        {
-            //ss
-        }
+        public Service() {}
         public Task StartAsync(CancellationToken cancellationToken)
         {
             Console.WriteLine("Task is started.");
