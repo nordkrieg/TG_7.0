@@ -33,17 +33,16 @@ namespace TG_7._0
             Console.WriteLine();
             Console.WriteLine(string.Concat(Enumerable.Repeat("-", 120)));
             Console.WriteLine();
-            var waiter = new ManualResetEventSlim(false);
-            waiter.Wait();
+
             //Console.ReadLine();
-            /*var hostBuilder = new HostBuilder()
+            var hostBuilder = new HostBuilder()
             .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Service>();
                 }
             );
 
-        await hostBuilder.RunConsoleAsync().ConfigureAwait(false);*/
+        await hostBuilder.RunConsoleAsync().ConfigureAwait(false);
 
         }
         private static async Task Update(ITelegramBotClient botClient, Update update, CancellationToken token)
@@ -310,7 +309,7 @@ namespace TG_7._0
         }
         private static Task Error(ITelegramBotClient client, Exception exception, CancellationToken token) => throw new NotImplementedException();
     }
-    /*public class Service : IHostedService
+    public class Service : IHostedService
     {
         public Service()
         {
@@ -326,5 +325,5 @@ namespace TG_7._0
             Console.WriteLine("Task stopped.");
             return Task.CompletedTask;
         }
-    }*/
+    }
 }
