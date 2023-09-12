@@ -12,7 +12,6 @@ namespace TG_7._0;
 internal abstract class Program : OthersMethods
 {
     private static string _month, _day;
-
     private static DateTime GetNetworkTime()
     {
         const string ntpServer = "0.ru.pool.ntp.org";
