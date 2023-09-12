@@ -20,7 +20,7 @@ internal abstract class Program : OthersMethods
         var addresses = Dns.GetHostEntry(ntpServer).AddressList;
         var ipEndPoint = new IPEndPoint(addresses[0], 123);
         var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        socket.ReceiveTimeout = 3000;
+        socket.ReceiveTimeout = 4000;
         socket.Connect(ipEndPoint);
         socket.Send(ntpData);
         socket.Receive(ntpData);
@@ -285,8 +285,7 @@ internal abstract class Program : OthersMethods
     }
     private static Task Error(ITelegramBotClient client, Exception exception, CancellationToken token)
     {
-        throw new NotImplementedException();
-
+        throw new NotImplementedException("треш");
     }
 }
 
