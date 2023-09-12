@@ -3,6 +3,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Microsoft.Extensions.Hosting;
+
 namespace TG_7._0
 {
     internal abstract class Program : OthersMethods
