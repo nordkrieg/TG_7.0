@@ -1,6 +1,4 @@
-﻿using ConvertApiDotNet;
-
-namespace TG_7._0
+﻿namespace TG_7._0
 {
     public class OthersMethods
     {
@@ -18,17 +16,7 @@ namespace TG_7._0
                 return false;
             }
         }
-        /*//Check for Saturday
-         public static bool CheckDateSat(DateTime date)
-         {
-             return date.DayOfWeek.ToString() == "Saturday";
-         }
 
-         //Check for Sunday
-         public static bool CheckDateSun(DateTime date)
-         {
-             return date.DayOfWeek.ToString() == "Sunday";
-         }*/
         protected static async Task DownLoad(string url, string path, DateTime date)
         {
             var day = date.DayOfYear.ToString();
@@ -49,14 +37,14 @@ namespace TG_7._0
             var year = date.Year.ToString();
             if (Convert.ToInt32(month) < 10) month = "0" + month;
             if (day[0] == '0') day = day.TrimStart('0');
-            var convertApi = new ConvertApi("de94yzMvTMSKKeEc");
-            var convert = await convertApi.ConvertAsync("pdf", "jpg",
-                new ConvertApiFileParam("File", $"{path}{day}.{month}.{year}.pdf")
-            );
-            await convert.SaveFilesAsync(path);
-        }
-        protected static void DeletePdf()
-        {
+            var pathsave = path;
+            path += day + "." + month + "." + year + ".pdf";
+            var dd = await File.ReadAllBytesAsync(path);
+            for (var i = 1; i < 3; i++)
+            {
+                var pngByte = Freeware.Pdf2Png.Convert(dd, i);
+                await File.WriteAllBytesAsync(Path.Combine(pathsave, day + "." + month + "." + year + $"-{i}.png"), pngByte);
+            }
             var pdfList = Directory.GetFiles(SchFold, "*.pdf");
             foreach (var f in pdfList)
             {
