@@ -5,32 +5,51 @@ using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using File = System.IO.File;
-
 namespace TG_7._0;
 
 internal abstract class Program : OthersMethods
 {
+    private static class BotConfiguration
+    {
+        public const string NtpServer = "0.ru.pool.ntp.org";
+    }
     private static string _month, _day;
     private static DateTime GetNetworkTime()
     {
-        const string ntpServer = "0.ru.pool.ntp.org";
+        const string ntpServer = BotConfiguration.NtpServer;
         var ntpData = new byte[48];
         ntpData[0] = 0x1B;
-        var addresses = Dns.GetHostEntry(ntpServer).AddressList;
-        var ipEndPoint = new IPEndPoint(addresses[0], 123);
-        var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        socket.ReceiveTimeout = 4000;
-        socket.Connect(ipEndPoint);
-        socket.Send(ntpData);
-        socket.Receive(ntpData);
-        socket.Close();
-        var intPart = ((ulong)ntpData[40] << 24) | ((ulong)ntpData[41] << 16) | ((ulong)ntpData[42] << 8) | ntpData[43];
-        var fractPart = ((ulong)ntpData[44] << 24) | ((ulong)ntpData[45] << 16) | ((ulong)ntpData[46] << 8) |
-                        ntpData[47];
-        var milliseconds = intPart * 1000 + fractPart * 1000 / 0x100000000L + 10798900;
-        var networkDateTime = new DateTime(1900, 1, 1).AddMilliseconds((long)milliseconds);
-        return networkDateTime;}
+        try
+        {
+            var addresses = Dns.GetHostEntry(ntpServer).AddressList;
+            var ipEndPoint = new IPEndPoint(addresses[0], 123);
+            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket.ReceiveTimeout = 4000;
+            socket.Connect(ipEndPoint);
+            socket.Send(ntpData);
+            socket.Receive(ntpData);
+            socket.Close();
+            var intPart = ((ulong)ntpData[40] << 24) | ((ulong)ntpData[41] << 16) | ((ulong)ntpData[42] << 8) |
+                          ntpData[43];
+            var fractPart = ((ulong)ntpData[44] << 24) | ((ulong)ntpData[45] << 16) | ((ulong)ntpData[46] << 8) |
+                            ntpData[47];
+            var milliseconds = intPart * 1000 + fractPart * 1000 / 0x100000000L + 10798900;
+            var networkDateTime = new DateTime(1900, 1, 1).AddMilliseconds((long)milliseconds);
+            return networkDateTime;
+        }
+        catch (SocketException ex)
+        {
+            Console.WriteLine("Ошибка соксета при получении времени: " + ex.Message);
+            return DateTime.Now;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Произошла ошибка при получении времени: " + ex.Message);
+            return DateTime.Now;
+        }
+    }
     private static async Task Main()
     {
         var botClient = new TelegramBotClient("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
@@ -44,7 +63,6 @@ internal abstract class Program : OthersMethods
             .ConfigureServices((hostContext, services) => services.AddHostedService<Service>());
         await hostBuilder.RunConsoleAsync().ConfigureAwait(false);
     }
-
     private static async Task Update(ITelegramBotClient botClient, Update update, CancellationToken token)
     {
         var message = update.Message;
@@ -75,37 +93,32 @@ internal abstract class Program : OthersMethods
                     _day = GetNetworkTime().AddDays(1).Day.ToString();
                     if (Convert.ToInt32(_month) < 10) _month ="0" + _month;
                     if (_day[0] == '0') _day = _day.TrimStart('0');
-                    if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg"))
-                    {
-                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg") &&
-                            File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.jpg"))
+                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png") &&
+                            File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.png"))
                         {
                             exFile = true;
                             await using Stream stream =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg");
+                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png");
                             await using Stream stream2 =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.jpg");
+                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.png");
                             await botClient.SendMediaGroupAsync(message.Chat.Id,
                                 new IAlbumInputMedia[]
                                 {
                                     new InputMediaPhoto(
-                                        InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}.jpg")),
+                                        InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}-1.png")),
                                     new InputMediaPhoto(
-                                        InputFile.FromStream(stream2, $"{_day}.{_month}.{GetNetworkTime().Year}-2.jpg"))
+                                        InputFile.FromStream(stream2, $"{_day}.{_month}.{GetNetworkTime().Year}-2.png"))
                                 }, cancellationToken: token);
                         }
-
-                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg") && exFile == false)
+                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png") && exFile == false)
                         {
                             exFile = true;
                             await using Stream stream =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg");
+                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png");
                             await botClient.SendPhotoAsync(message.Chat.Id,
-                                InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}.jpg"),
+                                InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}-1.png"),
                                 cancellationToken: token);
                         }
-                    }
-
                     var urlCheckResult =
                         await CheckUrl(
                             $"https://mkeiit.ru/wp-content/uploads/{GetNetworkTime().Year}/{_month}/{_day}.{_month}.{GetNetworkTime().Year}.pdf");
@@ -116,30 +129,30 @@ internal abstract class Program : OthersMethods
                             $"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.pdf", GetNetworkTime());
                         ConvertFile($"{SchFold}", GetNetworkTime().AddDays(1));
                         Thread.Sleep(2000);
-                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg") &&
-                            File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.jpg"))
+                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png") &&
+                            File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.png"))
                         {
                             exFile = true;
                             await using Stream stream =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg");
+                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png");
                             await using Stream stream2 =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.jpg");
+                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.png");
                             await botClient.SendMediaGroupAsync(message.Chat.Id,
                                 new IAlbumInputMedia[]
                                 {
                                     new InputMediaPhoto(
-                                        InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}.jpg")),
+                                        InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}-1.png")),
                                     new InputMediaPhoto(
-                                        InputFile.FromStream(stream2, $"{_day}.{_month}.{GetNetworkTime().Year}-2.jpg"))
+                                        InputFile.FromStream(stream2, $"{_day}.{_month}.{GetNetworkTime().Year}-2.png"))
                                 }, cancellationToken: token);
                         }
 
-                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg") && exFile == false)
+                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png") && exFile == false)
                         {
                             await using Stream stream =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg");
+                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png");
                             await botClient.SendPhotoAsync(message.Chat.Id,
-                                InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}.jpg"),
+                                InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}-1.png"),
                                 cancellationToken: token);
                         }
                     }
@@ -150,8 +163,6 @@ internal abstract class Program : OthersMethods
                                 $"Расписания на {GetNetworkTime().AddDays(1).ToShortDateString()} нет",
                                 cancellationToken: token);
                     }
-
-                    DeletePdf();
                     break;
                 }
                 case "/schedule_today":
@@ -159,41 +170,34 @@ internal abstract class Program : OthersMethods
                     var exFile = false;
                     _month = GetNetworkTime().Month.ToString();
                     _day = GetNetworkTime().Day.ToString();
-                    if (Convert.ToInt32(_month) < 10)
-                        _month = "0" + _month;
-                    if (_day[0] == '0')
-                        _day = _day.TrimStart('0');
-                    if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg"))
+                    if (Convert.ToInt32(_month) < 10)  _month = "0" + _month;
+                    if (_day[0] == '0')  _day = _day.TrimStart('0');
+                    if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png") &&
+                        File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.png"))
                     {
-                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg") &&
-                            File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.jpg"))
-                        {
-                            exFile = true;
-                            await using Stream stream =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg");
-                            await using Stream stream2 =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.jpg");
-                            await botClient.SendMediaGroupAsync(message.Chat.Id,
-                                new IAlbumInputMedia[]
-                                {
-                                    new InputMediaPhoto(
-                                        InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}.jpg")),
-                                    new InputMediaPhoto(
-                                        InputFile.FromStream(stream2, $"{_day}.{_month}.{GetNetworkTime().Year}-2.jpg"))
-                                }, cancellationToken: token);
-                        }
-
-                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg") && exFile == false)
-                        {
-                            exFile = true;
-                            await using Stream stream =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg");
-                            await botClient.SendPhotoAsync(message.Chat.Id,
-                                InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}.jpg"),
-                                cancellationToken: token);
-                        }
+                        exFile = true;
+                        await using Stream stream =
+                            File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png");
+                        await using Stream stream2 =
+                            File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.png");
+                        await botClient.SendMediaGroupAsync(message.Chat.Id,
+                            new IAlbumInputMedia[]
+                            {
+                                new InputMediaPhoto(
+                                    InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}-1.png")),
+                                new InputMediaPhoto(
+                                    InputFile.FromStream(stream2, $"{_day}.{_month}.{GetNetworkTime().Year}-2.png"))
+                            }, cancellationToken: token);
                     }
-
+                    if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png") && exFile == false)
+                    {
+                        exFile = true;
+                        await using Stream stream =
+                            File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png");
+                        await botClient.SendPhotoAsync(message.Chat.Id,
+                            InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}-1.png"),
+                            cancellationToken: token);
+                    }
                     var urlCheckResult =
                         await CheckUrl(
                             $"https://mkeiit.ru/wp-content/uploads/{GetNetworkTime().Year}/{_month}/{_day}.{_month}.{GetNetworkTime().Year}.pdf");
@@ -204,30 +208,29 @@ internal abstract class Program : OthersMethods
                             $"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.pdf", GetNetworkTime());
                         ConvertFile($"{SchFold}", GetNetworkTime());
                         Thread.Sleep(2000);
-                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg") &&
-                            File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.jpg"))
+                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png") &&
+                            File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.png"))
                         {
                             exFile = true;
                             await using Stream stream =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg");
+                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png");
                             await using Stream stream2 =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.jpg");
+                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-2.png");
                             await botClient.SendMediaGroupAsync(message.Chat.Id,
                                 new IAlbumInputMedia[]
                                 {
                                     new InputMediaPhoto(
-                                        InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}.jpg")),
+                                        InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}-1.png")),
                                     new InputMediaPhoto(
-                                        InputFile.FromStream(stream2, $"{_day}.{_month}.{GetNetworkTime().Year}-2.jpg"))
+                                        InputFile.FromStream(stream2, $"{_day}.{_month}.{GetNetworkTime().Year}-2.png"))
                                 }, cancellationToken: token);
                         }
-
-                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg") && exFile == false)
+                        if (File.Exists($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png") && exFile == false)
                         {
                             await using Stream stream =
-                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}.jpg");
+                                File.OpenRead($"{SchFold}{_day}.{_month}.{GetNetworkTime().Year}-1.png");
                             await botClient.SendPhotoAsync(message.Chat.Id,
-                                InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}.jpg"),
+                                InputFile.FromStream(stream, $"{_day}.{_month}.{GetNetworkTime().Year}-1.png"),
                                 cancellationToken: token);
                         }
                     }
@@ -237,8 +240,6 @@ internal abstract class Program : OthersMethods
                             await botClient.SendTextMessageAsync(message.Chat.Id,
                                 $"Расписания на {GetNetworkTime().ToShortDateString()} нет", cancellationToken: token);
                     }
-
-                    DeletePdf();
                     break;
                 }
                 case "/capybara":
