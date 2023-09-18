@@ -276,7 +276,7 @@ internal abstract class Program : OthersMethods
                     ResizeKeyboard = true
                 };
                 await botClient.SendTextMessageAsync(chatId: message.Chat, text: "ОК", replyMarkup: replyKeyboardMarkup, cancellationToken: cancellationToken);
-                }
+            }
             if (message.Text == "Поддержка")
             {
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Поддержать разработчика: \n\n" +
@@ -301,20 +301,18 @@ internal abstract class Program : OthersMethods
             }
         }
     }
-    private static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+    private static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
     {
         Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
         Console.WriteLine("Ужики я упал....");
+        return Task.CompletedTask;
     }
     private static Task Main()
     {
         Console.WriteLine("Ужики я жив....");
         var cts = new CancellationTokenSource();
         var cancellationToken = cts.Token;
-        var receiverOptions = new ReceiverOptions
-        {
-            AllowedUpdates = { }
-        };
+        var receiverOptions = new ReceiverOptions{};
         BotClient.StartReceiving(
             HandleUpdateAsync,
             HandleErrorAsync,
