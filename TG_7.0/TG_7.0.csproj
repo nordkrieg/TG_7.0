@@ -11,6 +11,7 @@
     <PackageReference Include="Freeware.Pdf2Png" Version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="telegram.bot" Version="19.0.0" />
+    <PackageReference Include="Telegram.Bots.Extensions.Polling" Version="5.9.0" />
     
   </ItemGroup>
 
