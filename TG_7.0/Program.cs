@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -17,91 +15,97 @@ internal abstract class Program : OthersMethods
         if (update.Type == UpdateType.Message)
         {
             var message = update.Message;
+            var moscowTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
             Console.WriteLine($"User: {message.Chat.Username}" + "\n" + $"Name: {message.Chat.FirstName}" + "\n" +
                               $"Surnameame: {message.Chat.LastName}" + "\n" + $"ID Chat: {message.Chat.Id}" + "\n" +
-                              $"Time: {GetNetworkTime()}" + "\n" + $"Text: {message.Text}" + "\n");
-            if (message.Text == "/start")
+                              $"Time: {moscowTime}" + "\n" + $"Text: {message.Text}" + "\n");
+            switch (message.Text)
             {
-                ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
+                case "/start":
                 {
-                    new KeyboardButton[] { "Расписание пар", "Инфа" },
-                    new KeyboardButton[] { "Расписание звонков", "Капибара" }
-                })
-                {
-                    ResizeKeyboard = true
-                };
-                await botClient.SendTextMessageAsync(
-                    chatId: message.Chat,
-                    text: "ОК",
-                    replyMarkup: replyKeyboardMarkup,
-                    cancellationToken: cancellationToken);
-            }
-            if (message.Text == "Расписание звонков")
-            {
-                await botClient.SendMediaGroupAsync(message.Chat.Id, new IAlbumInputMedia[]
-                {
-                    new InputMediaPhoto(
-                        InputFile.FromUri(
-                            "https://sun9-77.userapi.com/impg/as1MA-6kTJiBgNaTzlJchVz9WIdRuTZt9uNJpQ/2kp1pa0vxL4.jpg?size=994x467&quality=96&sign=87102e4153f1c047a2012aa21487f1cb&type=album"))
-                }, cancellationToken: cancellationToken);
-                return;
-            }
-            if (message.Text == "Расписание пар")
-            {
-                ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
-                {
-                    new KeyboardButton[] { "Пары на сегодня", "Пары на завтра","Назад"},
-                }) { ResizeKeyboard = true };
-                await botClient.SendTextMessageAsync(
-                    chatId: message.Chat.Id,
-                    text: "ОК",
-                    replyMarkup: replyKeyboardMarkup,
-                    cancellationToken: cancellationToken);
-            }
-            if (message.Text == "Пары на завтра") await Pari(GetNetworkTime().Day.ToString(), GetNetworkTime().Month.ToString(), GetNetworkTime().Year.ToString(), botClient, cancellationToken, message, 1);
-            if (message.Text == "Пары на сегодня") await Pari(GetNetworkTime().Day.ToString(), GetNetworkTime().Month.ToString(), GetNetworkTime().Year.ToString(), botClient, cancellationToken, message, 0);
-            if (message.Text == "Капибара")
-            {
-                var x = new Random();
-                var rand = x.Next(1, 45);
-                var link = File.ReadLines("../../../Fold_data/LinkCapybara.txt").ElementAtOrDefault(rand);
-                if (link != null)
-                    await botClient.SendPhotoAsync(message.Chat.Id,
-                        InputFile.FromUri(link), caption: $"{rand}/45", cancellationToken: cancellationToken);
-            }
-            if (message.Text == "Назад")
-            {
-                ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
-                {
-                    new KeyboardButton[] { "Расписание пар", "Инфа" },
-                    new KeyboardButton[] { "Расписание звонков", "Капибара" }
-                })
-                {
-                    ResizeKeyboard = true
-                };
-                await botClient.SendTextMessageAsync(chatId: message.Chat, text: "ОК", replyMarkup: replyKeyboardMarkup, cancellationToken: cancellationToken);
-            }
-            if (message.Text == "Поддержка")
-            {
-                await botClient.SendTextMessageAsync(message.Chat.Id, "Поддержать разработчика: \n\n" +
-                                                                      "СберБанк: `5469 4100 1429 4908`\n" +
-                                                                      "ВТБ: `2200 2460 4327 6560`\n\n",
-                    parseMode: ParseMode.MarkdownV2, cancellationToken: cancellationToken);
-            }
-            if (message.Text == "Сообщить о баге")
-            {
-                await botClient.SendTextMessageAsync(message.Chat.Id,
-                    "Сообщить об ошибке:\nTG: @n0rd_kr1eg\n" + "VK: https://vk.com/n0rd_kr1eg" +
-                    "\n\nВремя ответа: 5-15 минут", cancellationToken: cancellationToken);
-            }
-            if (message.Text == "Инфа")
-            {
-                ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
+                    ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
                     {
-                        new KeyboardButton[] { "Поддержка", "Сообщить о баге", "Назад"},
+                        new KeyboardButton[] { "Расписание пар", "Инфа" },
+                        new KeyboardButton[] { "Расписание звонков", "Капибара" }
                     })
-                    { ResizeKeyboard = true };
-                await botClient.SendTextMessageAsync(chatId: message.Chat.Id, text: "ОК", replyMarkup: replyKeyboardMarkup, cancellationToken: cancellationToken);
+                    {
+                        ResizeKeyboard = true
+                    };
+                    await botClient.SendTextMessageAsync(
+                        chatId: message.Chat,
+                        text: "ОК",
+                        replyMarkup: replyKeyboardMarkup,
+                        cancellationToken: cancellationToken);
+                    break;
+                }
+                case "Расписание звонков":
+                    await botClient.SendMediaGroupAsync(message.Chat.Id, new IAlbumInputMedia[]
+                    {
+                        new InputMediaPhoto(
+                            InputFile.FromUri(
+                                "https://sun9-77.userapi.com/impg/as1MA-6kTJiBgNaTzlJchVz9WIdRuTZt9uNJpQ/2kp1pa0vxL4.jpg?size=994x467&quality=96&sign=87102e4153f1c047a2012aa21487f1cb&type=album"))
+                    }, cancellationToken: cancellationToken);
+                    return;
+                case "Расписание пар":
+                {
+                    ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
+                    {
+                        new KeyboardButton[] { "Пары на сегодня", "Пары на завтра","Назад"},
+                    }) { ResizeKeyboard = true };
+                    await botClient.SendTextMessageAsync(
+                        chatId: message.Chat.Id,
+                        text: "ОК",
+                        replyMarkup: replyKeyboardMarkup,
+                        cancellationToken: cancellationToken);
+                    break;
+                }
+                case "Пары на завтра":
+                    await Pari(botClient, cancellationToken, message, 1);
+                    break;
+                case "Пары на сегодня":
+                    await Pari(botClient, cancellationToken, message, 0);
+                    break;
+                case "Капибара":
+                {
+                    var x = new Random();
+                    var rand = x.Next(1, 45);
+                    var link = File.ReadLines("../../../Fold_data/LinkCapybara.txt").ElementAtOrDefault(rand);
+                    if (link != null)
+                        await botClient.SendPhotoAsync(message.Chat.Id,
+                            InputFile.FromUri(link), caption: $"{rand}/45", cancellationToken: cancellationToken);
+                    break;
+                }
+                case "Назад":
+                {
+                    ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
+                    {
+                        new KeyboardButton[] { "Расписание пар", "Инфа" },
+                        new KeyboardButton[] { "Расписание звонков", "Капибара" }
+                    })
+                    {
+                        ResizeKeyboard = true
+                    };
+                    await botClient.SendTextMessageAsync(chatId: message.Chat, text: "ОК", replyMarkup: replyKeyboardMarkup, cancellationToken: cancellationToken);
+                    break;
+                }
+                case "Поддержка":
+                    await botClient.SendTextMessageAsync(message.Chat.Id, "Поддержать разработчика: \n\n" + "СберБанк: `5469 4100 1429 4908`\n" + "ВТБ: `2200 2460 4327 6560`\n\n", parseMode: ParseMode.MarkdownV2, cancellationToken: cancellationToken);
+                    break;
+                case "Сообщить о баге":
+                    await botClient.SendTextMessageAsync(message.Chat.Id,
+                        "Сообщить об ошибке:\nTG: @n0rd_kr1eg\n" + "VK: https://vk.com/n0rd_kr1eg" +
+                        "\n\nВремя ответа: 5-15 минут", cancellationToken: cancellationToken);
+                    break;
+                case "Инфа":
+                {
+                    ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
+                        {
+                            new KeyboardButton[] { "Поддержка", "Сообщить о баге", "Назад"},
+                        })
+                        { ResizeKeyboard = true };
+                    await botClient.SendTextMessageAsync(chatId: message.Chat.Id, text: "ОК", replyMarkup: replyKeyboardMarkup, cancellationToken: cancellationToken);
+                    break;
+                }
             }
         }
     }
