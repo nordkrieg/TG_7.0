@@ -41,11 +41,11 @@ namespace TG_7._0
             Console.WriteLine(pathsave);
             Console.WriteLine(path);
             var dd = await File.ReadAllBytesAsync(path);
-            Console.WriteLine("взрыв");
-            Console.WriteLine(BitConverter.ToString(dd));
             for (var i = 1; i < 3; i++)
             {
-                Console.WriteLine("взрыв_цикл");
+                Console.WriteLine($"взрыв_цикл, {i}");
+                Console.WriteLine(pathsave);
+                Console.WriteLine(path);
                 var pngByte = Pdf2Png.Convert(dd, i);
                 Console.WriteLine(BitConverter.ToString(pngByte));
                 await File.WriteAllBytesAsync(Path.Combine(pathsave, day + "." + month + "." + year + $"-{i}.png"), pngByte);
