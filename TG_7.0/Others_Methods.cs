@@ -37,10 +37,16 @@ namespace TG_7._0
         {
             var pathsave = path;
             path += day + "." + month + "." + year + ".pdf";
+            Console.WriteLine(pathsave);
+            Console.WriteLine(path);
             var dd = await File.ReadAllBytesAsync(path);
+            Console.WriteLine("взрыв");
+            Console.WriteLine(dd);
             for (var i = 1; i < 3; i++)
             {
+                Console.WriteLine("взрыв_цикл");
                 var pngByte = Freeware.Pdf2Png.Convert(dd, i);
+                Console.WriteLine(pngByte);
                 await File.WriteAllBytesAsync(Path.Combine(pathsave, day + "." + month + "." + year + $"-{i}.png"), pngByte);
             }
             var pdfList = Directory.GetFiles(pathsave, "*.pdf");
@@ -57,7 +63,7 @@ namespace TG_7._0
             var year = Convert.ToString(Convert.ToInt32(moscowTime.Year.ToString()));
             if (month.Length != 2) month = "0" + month;
             if (day[0] == '0') day = day.TrimStart('0');
-            var pt = SchFold + "/" + day + "." + month + "." + year + "/";
+            var pt = SchFold + day + "." + month + "." + year + "/";
             while (true)
             {
                 if (Directory.Exists(pt))
@@ -74,7 +80,6 @@ namespace TG_7._0
                     Directory.CreateDirectory(pt);
                     await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{month}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime);
                     await ConvertFile($"{pt}", day, month, year); 
-                    Thread.Sleep(2000);
                     continue;
                 }
                 else
