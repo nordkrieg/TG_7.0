@@ -73,8 +73,8 @@ namespace TG_7._0
                 {
                     Directory.CreateDirectory(pt);
                     await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{month}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime);
-                    await ConvertFile($"{pt}", day, month, year);
-                        //Thread.Sleep(2000);
+                    await ConvertFile($"{pt}", day, month, year); 
+                    Thread.Sleep(2000);
                     continue;
                 }
                 else
