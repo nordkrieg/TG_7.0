@@ -41,15 +41,15 @@ namespace TG_7._0
             Console.WriteLine(pathsave);
             Console.WriteLine(path);
             var dd = await File.ReadAllBytesAsync(path);
-            for (var i = 1; i < 3; i++)
-            {
-                Console.WriteLine($"взрыв_цикл, {i}");
-                Console.WriteLine(pathsave);
-                Console.WriteLine(path);
-                var pngByte = Pdf2Png.Convert(dd, i);
-                Console.WriteLine(BitConverter.ToString(pngByte));
-                await File.WriteAllBytesAsync(Path.Combine(pathsave, day + "." + month + "." + year + $"-{i}.png"), pngByte);
-            }
+            Console.WriteLine($"взрыв_цикл");
+            Console.WriteLine(pathsave);
+            Console.WriteLine(path);
+            var pngByte = Pdf2Png.Convert(dd, 1);
+            if (pngByte != null) Console.WriteLine("чёта1");
+            var pngByte2 = Pdf2Png.Convert(dd, 2);
+            if (pngByte2 != null) Console.WriteLine("чёта2");
+            await File.WriteAllBytesAsync(Path.Combine(pathsave, day + "." + month + "." + year + $"-1.png"), pngByte);
+            await File.WriteAllBytesAsync(Path.Combine(pathsave, day + "." + month + "." + year + $"-2.png"), pngByte2);
             var pdfList = Directory.GetFiles(pathsave, "*.pdf");
             foreach (var f in pdfList)
             {
