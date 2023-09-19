@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using Freeware;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using File = System.IO.File;
 
@@ -41,12 +42,12 @@ namespace TG_7._0
             Console.WriteLine(path);
             var dd = await File.ReadAllBytesAsync(path);
             Console.WriteLine("взрыв");
-            Console.WriteLine(dd);
+            Console.WriteLine(BitConverter.ToString(dd));
             for (var i = 1; i < 3; i++)
             {
                 Console.WriteLine("взрыв_цикл");
-                var pngByte = Freeware.Pdf2Png.Convert(dd, i);
-                Console.WriteLine(pngByte);
+                var pngByte = Pdf2Png.Convert(dd, i);
+                Console.WriteLine(BitConverter.ToString(pngByte));
                 await File.WriteAllBytesAsync(Path.Combine(pathsave, day + "." + month + "." + year + $"-{i}.png"), pngByte);
             }
             var pdfList = Directory.GetFiles(pathsave, "*.pdf");
