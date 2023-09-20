@@ -1,4 +1,5 @@
-﻿using Freeware;
+﻿using PdfLibCore;
+using PdfLibCore.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using File = System.IO.File;
@@ -34,32 +35,10 @@ namespace TG_7._0
                 await File.WriteAllBytesAsync(path, fileBytes);
             }
         }
-        private static async Task ConvertFile(string path, string day, string month, string year)
-        {
-            var pathsave = path;
-            path += day + "." + month + "." + year + ".pdf";
-            Console.WriteLine(pathsave);
-            Console.WriteLine(path);
-            var dd = await File.ReadAllBytesAsync(path);
-            Console.WriteLine($"взрыв_цикл");
-            Console.WriteLine(pathsave);
-            Console.WriteLine(path);
-            var pngByte = Pdf2Png.Convert(dd, 1);
-            if (pngByte != null) Console.WriteLine("чёта1");
-            var pngByte2 = Pdf2Png.Convert(dd, 2);
-            if (pngByte2 != null) Console.WriteLine("чёта2");
-            await File.WriteAllBytesAsync(Path.Combine(pathsave, day + "." + month + "." + year + $"-1.png"), pngByte);
-            await File.WriteAllBytesAsync(Path.Combine(pathsave, day + "." + month + "." + year + $"-2.png"), pngByte2);
-            var pdfList = Directory.GetFiles(pathsave, "*.pdf");
-            foreach (var f in pdfList)
-            {
-                File.Delete(f);
-            }
-        }
-        protected static async Task Pari(ITelegramBotClient botClient, CancellationToken cancellationToken, Message message, int X)
+        protected static async Task Pari(ITelegramBotClient botClient, CancellationToken cancellationToken, Message message, int x)
         {
             var moscowTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
-            var day = Convert.ToString(Convert.ToInt32(moscowTime.Day.ToString()) + X);
+            var day = Convert.ToString(Convert.ToInt32(moscowTime.Day.ToString()) + x);
             var month = Convert.ToString(Convert.ToInt32(moscowTime.Month.ToString()));
             var year = Convert.ToString(Convert.ToInt32(moscowTime.Year.ToString()));
             if (month.Length != 2) month = "0" + month;
@@ -69,9 +48,15 @@ namespace TG_7._0
             {
                 if (Directory.Exists(pt))
                 {
-                    Stream stream = File.OpenRead($"{pt}{day}.{month}.{year}-1.png"); 
-                    Stream stream2 = File.OpenRead($"{pt}{day}.{month}.{year}-2.png");
-                    await botClient.SendMediaGroupAsync(message.Chat.Id, new IAlbumInputMedia[] { new InputMediaPhoto(InputFile.FromStream(stream, $"{pt}{day}.{month}.{year}-1.png")), new InputMediaPhoto(InputFile.FromStream(stream2, $"{pt}{day}.{month}.{year}-2.png")) }, cancellationToken: cancellationToken);
+                    Console.WriteLine($"{pt}{day}.{month}.{year}-0.png");
+                    Stream stream = File.OpenRead($"{pt}{day}.{month}.{year}-0.png");
+                    Stream stream2 = File.OpenRead($"{pt}{day}.{month}.{year}-1.png");
+                    IAlbumInputMedia[] streamArray =
+                    {
+                        new InputMediaPhoto(InputFile.FromStream(stream, $"{pt}{day}.{month}.{year}-0.png")),
+                        new InputMediaPhoto(InputFile.FromStream(stream2, $"{pt}{day}.{month}.{year}-1.png")),
+                    };
+                    await botClient.SendMediaGroupAsync(message.Chat.Id, streamArray, cancellationToken: cancellationToken);
                     break;
                 }
 
@@ -80,15 +65,39 @@ namespace TG_7._0
                 {
                     Directory.CreateDirectory(pt);
                     await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{month}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime);
-                    await ConvertFile($"{pt}", day, month, year); 
+                    await ConvertPdFtoHojas($"{pt}", day, month, year); 
                     continue;
                 }
                 else
                 {
-                    await botClient.SendTextMessageAsync(message.Chat.Id, $"Расписания на {moscowTime.AddDays(X).ToShortDateString()} нет", cancellationToken: cancellationToken);
+                    await botClient.SendTextMessageAsync(message.Chat.Id, $"Расписания на {moscowTime.AddDays(x).ToShortDateString()} нет", cancellationToken: cancellationToken);
                 }
                 break;
             }
         }
+        private static async Task ConvertPdFtoHojas(string path, string day, string month, string year)
+        {
+            var pathsave = path;
+            path += day + "." + month + "." + year + ".pdf";
+            using var pdfDocument = new PdfDocument(File.Open(path, FileMode.Open));
+            using var pagesi = pdfDocument;
+            var dpiX = 300D;
+            var dpiY = 300D;
+            for (var i = 0; i < pagesi.Pages.Count; i++)
+            {
+                var pageWidth = (int)(300 * pagesi.Pages[i].Size.Width / 72);
+                var pageHeight = (int)(300 * pagesi.Pages[i].Size.Height / 72);
+                using var bitmap = new PdfiumBitmap(pageWidth, pageHeight, true);
+                pagesi.Pages[i].Render(bitmap, PageOrientations.Normal, RenderingFlags.LcdText);
+                byte[] byteArray;
+                using (var memoryStream = new MemoryStream())
+                {
+                    await bitmap.AsBmpStream(dpiX, dpiY).CopyToAsync(memoryStream);
+                    byteArray = memoryStream.ToArray();
+                }
+                await File.WriteAllBytesAsync((pathsave + day + "." + month + "." + year + $"-{i}.png"), byteArray);
+            }
+        }
+
     }
 }
