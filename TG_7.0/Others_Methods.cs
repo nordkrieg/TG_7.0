@@ -1,5 +1,9 @@
 ﻿using PdfLibCore;
 using PdfLibCore.Enums;
+using System.Drawing.Imaging;
+using System.Drawing;
+using System.IO;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using File = System.IO.File;
@@ -48,15 +52,10 @@ namespace TG_7._0
             {
                 if (Directory.Exists(pt))
                 {
-                    Console.WriteLine($"{pt}{day}.{month}.{year}-0.png");
-                    Stream stream = File.OpenRead($"{pt}{day}.{month}.{year}-0.png");
-                    Stream stream2 = File.OpenRead($"{pt}{day}.{month}.{year}-1.png");
-                    IAlbumInputMedia[] streamArray =
-                    {
-                        new InputMediaPhoto(InputFile.FromStream(stream, $"{pt}{day}.{month}.{year}-0.png")),
-                        new InputMediaPhoto(InputFile.FromStream(stream2, $"{pt}{day}.{month}.{year}-1.png")),
-                    };
-                    await botClient.SendMediaGroupAsync(message.Chat.Id, streamArray, cancellationToken: cancellationToken);
+                    Stream stream = File.OpenRead($"{pt}{day}.{month}.{year}-3.jpg");
+                    Stream stream2 = File.OpenRead($"{pt}{day}.{month}.{year}-4.jpg");
+                    await botClient.SendMediaGroupAsync(message.Chat.Id, new IAlbumInputMedia[] { new InputMediaPhoto(InputFile.FromStream(stream, $"{pt}{day}.{month}.{year}-3.jpg")), 
+                        new InputMediaPhoto(InputFile.FromStream(stream2, $"{pt}{day}.{month}.{year}-4.jpg")) }, cancellationToken: cancellationToken);
                     break;
                 }
 
@@ -78,26 +77,35 @@ namespace TG_7._0
         private static async Task ConvertPdFtoHojas(string path, string day, string month, string year)
         {
             var pathsave = path;
-            path += day + "." + month + "." + year + ".pdf";
-            using var pdfDocument = new PdfDocument(File.Open(path, FileMode.Open));
+            using var pdfDocument = new PdfDocument(File.Open(path + day + "." + month + "." + year + ".pdf", FileMode.Open));
             using var pagesi = pdfDocument;
-            var dpiX = 300D;
-            var dpiY = 300D;
             for (var i = 0; i < pagesi.Pages.Count; i++)
             {
-                var pageWidth = (int)(300 * pagesi.Pages[i].Size.Width / 72);
-                var pageHeight = (int)(300 * pagesi.Pages[i].Size.Height / 72);
-                using var bitmap = new PdfiumBitmap(pageWidth, pageHeight, true);
+                var pageWidth = (pagesi.Pages[i].Size.Width);
+                var pageHeight = (pagesi.Pages[i].Size.Height);
+                using var bitmap = new PdfiumBitmap((int)pageWidth, (int)pageHeight, false);
                 pagesi.Pages[i].Render(bitmap, PageOrientations.Normal, RenderingFlags.LcdText);
                 byte[] byteArray;
                 using (var memoryStream = new MemoryStream())
                 {
-                    await bitmap.AsBmpStream(dpiX, dpiY).CopyToAsync(memoryStream);
+                    await bitmap.AsBmpStream(1 , 1).CopyToAsync(memoryStream);
                     byteArray = memoryStream.ToArray();
                 }
                 await File.WriteAllBytesAsync((pathsave + day + "." + month + "." + year + $"-{i}.png"), byteArray);
+                using var bmp1 = new Bitmap($"{pathsave}{day}.{month}.{year}-{i}.png");
+                var jgpEncoder = GetEncoder(ImageFormat.Jpeg);
+                var myEncoder = System.Drawing.Imaging.Encoder.Quality;
+                EncoderParameters myEncoderParameters = new(1);
+                var myEncoderParameter = new EncoderParameter(myEncoder, 100L);
+                myEncoderParameters.Param[0] = myEncoderParameter;
+                bmp1.Save($"{pathsave}{day}.{month}.{year}-{i + 3}.jpg", jgpEncoder, myEncoderParameters);
             }
         }
-
+        private static ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            var codecs = ImageCodecInfo.GetImageEncoders();
+            return codecs.FirstOrDefault(codec => codec.FormatID == format.Guid);
+        }
     }
+
 }
