@@ -7,6 +7,7 @@ using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using File = System.IO.File;
+using System.Runtime.Intrinsics.X86;
 
 namespace TG_7._0
 {
@@ -92,14 +93,21 @@ namespace TG_7._0
                     byteArray = memoryStream.ToArray();
                 }
                 await File.WriteAllBytesAsync((pathsave + day + "." + month + "." + year + $"-{i}.png"), byteArray);
-                using var bmp1 = new Bitmap($"{pathsave}{day}.{month}.{year}-{i}.png");
-                var jgpEncoder = GetEncoder(ImageFormat.Jpeg);
-                var myEncoder = System.Drawing.Imaging.Encoder.Quality;
-                EncoderParameters myEncoderParameters = new(1);
-                var myEncoderParameter = new EncoderParameter(myEncoder, 100L);
-                myEncoderParameters.Param[0] = myEncoderParameter;
-                bmp1.Save($"{pathsave}{day}.{month}.{year}-{i + 3}.jpg", jgpEncoder, myEncoderParameters);
             }
+            using var bmp1 = new Bitmap($"{pathsave}{day}.{month}.{year}-0.png");
+            var jgpEncoder = GetEncoder(ImageFormat.Jpeg);
+            var myEncoder = System.Drawing.Imaging.Encoder.Quality;
+            EncoderParameters myEncoderParameters = new(1);
+            var myEncoderParameter = new EncoderParameter(myEncoder, 100L);
+            myEncoderParameters.Param[0] = myEncoderParameter;
+            bmp1.Save($"{pathsave}{day}.{month}.{year}-3.jpg", jgpEncoder, myEncoderParameters);
+            using var bmp2 = new Bitmap($"{pathsave}{day}.{month}.{year}-1.png");
+            var jgpEncoder1 = GetEncoder(ImageFormat.Jpeg);
+            var myEncoder1 = System.Drawing.Imaging.Encoder.Quality;
+            EncoderParameters myEncoderParameters1 = new(1);
+            var myEncoderParameter1 = new EncoderParameter(myEncoder1, 100L);
+            myEncoderParameters1.Param[0] = myEncoderParameter1;
+            bmp2.Save($"{pathsave}{day}.{month}.{year}-4.jpg", jgpEncoder1, myEncoderParameters1);
         }
         private static ImageCodecInfo GetEncoder(ImageFormat format)
         {
