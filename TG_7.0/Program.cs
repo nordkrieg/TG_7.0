@@ -118,6 +118,7 @@ internal abstract class Program : OthersMethods
     private static Task Main()
     {
         Console.WriteLine("Ужики я жив....");
+        AppContext.SetSwitch("System.Drawing.EnableUnixSupport", true);
         var cts = new CancellationTokenSource();
         var cancellationToken = cts.Token;
         var receiverOptions = new ReceiverOptions{};
