@@ -1,19 +1,18 @@
 ﻿using PdfLibCore;
 using PdfLibCore.Enums;
-using System.Drawing.Imaging;
 using System.Drawing;
-using System.IO;
-using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using File = System.IO.File;
-using System.Runtime.Intrinsics.X86;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace TG_7._0
 {
     public class OthersMethods
     {
-        private static string SchFold => "../../../Fold_data/sch_fold/";
         private static async Task<bool> CheckUrl(string url)
         {
             using var client = new HttpClient();
@@ -48,13 +47,13 @@ namespace TG_7._0
             var year = Convert.ToString(Convert.ToInt32(moscowTime.Year.ToString()));
             if (month.Length != 2) month = "0" + month;
             if (day[0] == '0') day = day.TrimStart('0');
-            var pt = SchFold + day + "." + month + "." + year + "/";
+            var pt = "../../../Fold_data/sch_fold/" + day + "." + month + "." + year + "/";
             while (true)
             {
                 if (Directory.Exists(pt))
                 {
-                    Stream stream = File.OpenRead($"{pt}{day}.{month}.{year}-3.jpg");
-                    Stream stream2 = File.OpenRead($"{pt}{day}.{month}.{year}-4.jpg");
+                    Stream stream = File.OpenRead($"{pt}{day}.{month}.{year}-0.jpg");
+                    Stream stream2 = File.OpenRead($"{pt}{day}.{month}.{year}-1.jpg");
                     await botClient.SendMediaGroupAsync(message.Chat.Id, new IAlbumInputMedia[] { new InputMediaPhoto(InputFile.FromStream(stream, $"{pt}{day}.{month}.{year}-3.jpg")), 
                         new InputMediaPhoto(InputFile.FromStream(stream2, $"{pt}{day}.{month}.{year}-4.jpg")) }, cancellationToken: cancellationToken);
                     break;
@@ -77,7 +76,6 @@ namespace TG_7._0
         }
         private static async Task ConvertPdFtoHojas(string path, string day, string month, string year)
         {
-            var pathsave = path;
             using var pdfDocument = new PdfDocument(File.Open(path + day + "." + month + "." + year + ".pdf", FileMode.Open));
             using var pagesi = pdfDocument;
             for (var i = 0; i < pagesi.Pages.Count; i++)
@@ -92,27 +90,13 @@ namespace TG_7._0
                     await bitmap.AsBmpStream(1 , 1).CopyToAsync(memoryStream);
                     byteArray = memoryStream.ToArray();
                 }
-                await File.WriteAllBytesAsync((pathsave + day + "." + month + "." + year + $"-{i}.png"), byteArray);
+                await File.WriteAllBytesAsync((path + day + "." + month + "." + year + $"-{i}.png"), byteArray);
+                var image1 = await Image.LoadAsync($"{path}{day}.{month}.{year}-{i}.png");
+                var encoder = new JpegEncoder { Quality = 100 };
+                await image1.SaveAsync($"{path}{day}.{month}.{year}-{i}.jpg", encoder);
+                File.Delete(path + day + "." + month + "." + year + $"-{i}.png");
             }
-            using var bmp1 = new Bitmap($"{pathsave}{day}.{month}.{year}-0.png");
-            var jgpEncoder = GetEncoder(ImageFormat.Jpeg);
-            var myEncoder = System.Drawing.Imaging.Encoder.Quality;
-            EncoderParameters myEncoderParameters = new(1);
-            var myEncoderParameter = new EncoderParameter(myEncoder, 100L);
-            myEncoderParameters.Param[0] = myEncoderParameter;
-            bmp1.Save($"{pathsave}{day}.{month}.{year}-3.jpg", jgpEncoder, myEncoderParameters);
-            using var bmp2 = new Bitmap($"{pathsave}{day}.{month}.{year}-1.png");
-            var jgpEncoder1 = GetEncoder(ImageFormat.Jpeg);
-            var myEncoder1 = System.Drawing.Imaging.Encoder.Quality;
-            EncoderParameters myEncoderParameters1 = new(1);
-            var myEncoderParameter1 = new EncoderParameter(myEncoder1, 100L);
-            myEncoderParameters1.Param[0] = myEncoderParameter1;
-            bmp2.Save($"{pathsave}{day}.{month}.{year}-4.jpg", jgpEncoder1, myEncoderParameters1);
-        }
-        private static ImageCodecInfo GetEncoder(ImageFormat format)
-        {
-            var codecs = ImageCodecInfo.GetImageEncoders();
-            return codecs.FirstOrDefault(codec => codec.FormatID == format.Guid);
+            File.Delete(path + day + "." + month + "." + year + ".pdf");
         }
     }
 
