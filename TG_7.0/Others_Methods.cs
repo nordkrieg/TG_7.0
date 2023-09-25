@@ -1,11 +1,7 @@
 ﻿using PdfLibCore;
 using PdfLibCore.Enums;
-using System.Drawing;
-using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 using File = System.IO.File;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using Image = SixLabors.ImageSharp.Image;
