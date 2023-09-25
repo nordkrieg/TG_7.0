@@ -1,19 +1,15 @@
 ﻿using PdfLibCore;
 using PdfLibCore.Enums;
-using System.Drawing.Imaging;
 using System.Drawing;
-using System.IO;
-using System.Text;
+using System.Drawing.Imaging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using File = System.IO.File;
-using System.Runtime.Intrinsics.X86;
 
 namespace TG_7._0
 {
     public class OthersMethods
     {
-        private static string SchFold => "../../../Fold_data/sch_fold/";
         private static async Task<bool> CheckUrl(string url)
         {
             using var client = new HttpClient();
@@ -48,7 +44,7 @@ namespace TG_7._0
             var year = Convert.ToString(Convert.ToInt32(moscowTime.Year.ToString()));
             if (month.Length != 2) month = "0" + month;
             if (day[0] == '0') day = day.TrimStart('0');
-            var pt = SchFold + day + "." + month + "." + year + "/";
+            var pt = "../../../Fold_data/sch_fold/" + day + "." + month + "." + year + "/";
             while (true)
             {
                 if (Directory.Exists(pt))
