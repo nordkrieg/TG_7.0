@@ -7,7 +7,7 @@ namespace TG_7._0;
 internal abstract class UserCh { 
     private static readonly HashSet<int> BannedUserIds = new() { 626421947, 917027444};
     private static readonly ConcurrentDictionary<long, Queue<DateTime>> MessageTimes = new();
-    private const int MaxMessageCount = 3;
+    private const int MaxMessageCount = 5;
     private static readonly TimeSpan MessageTimeWindow = TimeSpan.FromSeconds(5);
     private static readonly ConcurrentDictionary<long, DateTime> UserBlockedUntil = new();
     public static async Task<bool> Task(Message message, CancellationToken cancellationToken, ITelegramBotClient botClient)
