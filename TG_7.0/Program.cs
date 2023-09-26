@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using System.Collections.Concurrent;
+using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -10,11 +11,17 @@ namespace TG_7._0;
 internal abstract class Program : OthersMethods
 {
     private static readonly ITelegramBotClient BotClient = new TelegramBotClient("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
+
     private static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         if (update.Type == UpdateType.Message)
         {
             var message = update.Message;
+            var aba = await UserCh.Task(message, cancellationToken, botClient);
+            if (aba == true)
+            {
+                return;
+            }
             var moscowTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
             Console.WriteLine($"User: {message.Chat.Username}" + "\n" + $"Name: {message.Chat.FirstName}" + "\n" +
                               $"Surnameame: {message.Chat.LastName}" + "\n" + $"ID Chat: {message.Chat.Id}" + "\n" +
@@ -26,7 +33,7 @@ internal abstract class Program : OthersMethods
                     ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
                     {
                         new KeyboardButton[] { "Расписание пар", "Инфа" },
-                        new KeyboardButton[] { "Расписание звонков", "Капибара" }
+                        new KeyboardButton[] { "Расписание звонков", "Капибара"}
                     })
                     {
                         ResizeKeyboard = true
@@ -39,18 +46,13 @@ internal abstract class Program : OthersMethods
                     break;
                 }
                 case "Расписание звонков":
-                    await botClient.SendMediaGroupAsync(message.Chat.Id, new IAlbumInputMedia[]
-                    {
-                        new InputMediaPhoto(
-                            InputFile.FromUri(
-                                "https://sun9-77.userapi.com/impg/as1MA-6kTJiBgNaTzlJchVz9WIdRuTZt9uNJpQ/2kp1pa0vxL4.jpg?size=994x467&quality=96&sign=87102e4153f1c047a2012aa21487f1cb&type=album"))
-                    }, cancellationToken: cancellationToken);
+                    await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromUri("https://sun9-77.userapi.com/impg/as1MA-6kTJiBgNaTzlJchVz9WIdRuTZt9uNJpQ/2kp1pa0vxL4.jpg?size=994x467&quality=96&sign=87102e4153f1c047a2012aa21487f1cb&type=album"), cancellationToken: cancellationToken);
                     return;
                 case "Расписание пар":
                 {
                     ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
                     {
-                        new KeyboardButton[] { "Пары на сегодня", "Пары на завтра","Назад"},
+                        new KeyboardButton[] { "Пары на сегодня", "Пары на завтра", "Назад" },
                     }) { ResizeKeyboard = true };
                     await botClient.SendTextMessageAsync(
                         chatId: message.Chat.Id,
@@ -80,16 +82,20 @@ internal abstract class Program : OthersMethods
                     ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
                     {
                         new KeyboardButton[] { "Расписание пар", "Инфа" },
-                        new KeyboardButton[] { "Расписание звонков", "Капибара" }
+                        new KeyboardButton[] { "Расписание звонков", "Капибара"}
                     })
                     {
                         ResizeKeyboard = true
                     };
-                    await botClient.SendTextMessageAsync(chatId: message.Chat, text: "ОК", replyMarkup: replyKeyboardMarkup, cancellationToken: cancellationToken);
+                    await botClient.SendTextMessageAsync(chatId: message.Chat, text: "ОК",
+                        replyMarkup: replyKeyboardMarkup, cancellationToken: cancellationToken);
                     break;
                 }
                 case "Поддержка":
-                    await botClient.SendTextMessageAsync(message.Chat.Id, "Поддержать разработчика: \n\n" + "СберБанк: `5469 4100 1429 4908`\n" + "ВТБ: `2200 2460 4327 6560`\n\n", parseMode: ParseMode.MarkdownV2, cancellationToken: cancellationToken);
+                    await botClient.SendTextMessageAsync(message.Chat.Id,
+                        "Поддержать разработчика: \n\n" + "СберБанк: `5469 4100 1429 4908`\n" +
+                        "ВТБ: `2200 2460 4327 6560`\n\n", parseMode: ParseMode.MarkdownV2,
+                        cancellationToken: cancellationToken);
                     break;
                 case "Сообщить о баге":
                     await botClient.SendTextMessageAsync(message.Chat.Id,
@@ -100,28 +106,34 @@ internal abstract class Program : OthersMethods
                 {
                     ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
                         {
-                            new KeyboardButton[] { "Поддержка", "Сообщить о баге", "Назад"},
+                            new KeyboardButton[] { "Поддержка", "Сообщить о баге", "Назад" },
                         })
                         { ResizeKeyboard = true };
                     await botClient.SendTextMessageAsync(chatId: message.Chat.Id, text: "ОК", replyMarkup: replyKeyboardMarkup, cancellationToken: cancellationToken);
                     break;
                 }
+                case "Пары на определённый день":
+                    //await SendCalendar(message.Chat.Id, moscowTime, botClient);
+                    break;
             }
         }
     }
-    private static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+
+    private static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
+        CancellationToken cancellationToken)
     {
         Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
         Console.WriteLine("Ужики я упал....");
         return Task.CompletedTask;
     }
+
     private static Task Main()
     {
         Console.WriteLine("Ужики я жив....");
         AppContext.SetSwitch("System.Drawing.EnableUnixSupport", true);
         var cts = new CancellationTokenSource();
         var cancellationToken = cts.Token;
-        var receiverOptions = new ReceiverOptions{};
+        var receiverOptions = new ReceiverOptions { };
         BotClient.StartReceiving(
             HandleUpdateAsync,
             HandleErrorAsync,
