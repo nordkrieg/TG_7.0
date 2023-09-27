@@ -2,7 +2,6 @@
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types;
 using Telegram.Bot;
-
 namespace TG_7._0;
 internal abstract class UserCh { 
     private static readonly HashSet<int> BannedUserIds = new() { 626421947, 917027444};
@@ -12,12 +11,12 @@ internal abstract class UserCh {
     private static readonly ConcurrentDictionary<long, DateTime> UserBlockedUntil = new();
     public static async Task<bool> Task(Message message, CancellationToken cancellationToken, ITelegramBotClient botClient)
     {
-        if (message == null || message.Type != MessageType.Text) return true;
+        if (message is not { Type: MessageType.Text }) return true;
         if (BannedUserIds.Contains((int)message.Chat.Id))
         {
             await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId, cancellationToken: cancellationToken);
             await botClient.SendTextMessageAsync(message.Chat.Id, "Ваше сообщение было удалено, а вы заблокированы", cancellationToken: cancellationToken);
-            Console.WriteLine($"Сообщение от забаненного пользователя: " + message.Chat.Id);
+            Console.WriteLine("Сообщение от забаненного пользователя: " + message.Chat.Id);
             return true;
         }
         if (IsUserBlocked(message.From.Id))

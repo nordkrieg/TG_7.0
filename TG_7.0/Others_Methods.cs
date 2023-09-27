@@ -51,23 +51,25 @@ public class OthersMethods
             if (Directory.Exists(pt))
             {
                 Stream stream = File.OpenRead($"{pt}{day}.{month}.{year}-0.jpg");
-                Stream stream2 = File.OpenRead($"{pt}{day}.{month}.{year}-1.jpg");
-                await botClient.SendMediaGroupAsync(message.Chat.Id, new IAlbumInputMedia[] { new InputMediaPhoto(InputFile.FromStream(stream, $"{pt}{day}.{month}.{year}-3.jpg")), 
-                    new InputMediaPhoto(InputFile.FromStream(stream2, $"{pt}{day}.{month}.{year}-4.jpg")) }, cancellationToken: cancellationToken);
+                if (File.Exists($"{pt}{day}.{month}.{year}-1.jpg"))
+                {
+                    Stream stream2 = File.OpenRead($"{pt}{day}.{month}.{year}-1.jpg");
+                    await botClient.SendMediaGroupAsync(message.Chat.Id, new IAlbumInputMedia[] { new InputMediaPhoto(InputFile.FromStream(stream, $"{pt}{day}.{month}.{year}-0.jpg")),
+                        new InputMediaPhoto(InputFile.FromStream(stream2, $"{pt}{day}.{month}.{year}-1.jpg")) }, cancellationToken: cancellationToken);
+                    break;
+                }
+                await botClient.SendPhotoAsync(message.Chat.Id, InputFile.FromStream(stream, $"{pt}{day}.{month}.{year}-1.jpg"), cancellationToken: cancellationToken);
                 break;
             }
             var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{year}/{month}/{day}.{month}.{year}.pdf");
-            if (urlCheckResult == true)
+            if (urlCheckResult)
             {
                 Directory.CreateDirectory(pt);
                 await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{month}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime);
                 await ConvertPdFtoHojas($"{pt}", day, month, year); 
                 continue;
             }
-            else
-            {
-                await botClient.SendTextMessageAsync(message.Chat.Id, $"Расписания на {moscowTime.AddDays(x).ToShortDateString()} нет", cancellationToken: cancellationToken);
-            }
+            await botClient.SendTextMessageAsync(message.Chat.Id, $"Расписания на {moscowTime.AddDays(x).ToShortDateString()} нет", cancellationToken: cancellationToken);
             break;
         }
     }
