@@ -1,18 +1,14 @@
-﻿using System.Threading;
-using Telegram.Bot.Polling;
+﻿using Telegram.Bot.Polling;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableMethods.FormattingOptions;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 using Telegram.BotAPI.UpdatingMessages;
-using Telegram.Bots.Http;
 using BotClient = Telegram.BotAPI.BotClient;
 using File = System.IO.File;
-
 namespace TG_7._0;
-
-class Program
+internal abstract class Program
 {
     private static readonly BotClient Bot = new("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
 
@@ -31,11 +27,9 @@ class Program
                 {
                     switch (update.Type)
                     {
-                        case UpdateType.Message:
-                            OnMessage(update.Message, Bot, cancellationToken);
+                        case UpdateType.Message: OnMessage(update.Message, Bot, cancellationToken);
                             break;
-                        case UpdateType.CallbackQuery:
-                            OnCallbackQuery(update.CallbackQuery);
+                        case UpdateType.CallbackQuery: OnCallbackQuery(update.CallbackQuery);
                             break;
                     }
                 }
@@ -167,9 +161,10 @@ class Program
     }
     private static void OnCallbackQuery(CallbackQuery query)
     {
+        if (query.Data == null) return;
         var cbargs = query.Data.Split(' ');
         switch (cbargs[0])
-        {
+        { 
             case "month":
                 var month = new Month((MonthName)Enum.Parse(typeof(MonthName), cbargs[2]), uint.Parse(cbargs[1]));
                 var mkeyboard = new InlineKeyboardMarkup
@@ -195,12 +190,16 @@ class Program
                     ReplyMarkup = ykeyboard
                 });
                 break;
-            default:
+            case "day":
+                var selectedDay = cbargs[3];
+                Console.WriteLine($"Selected Day: {selectedDay}");
+                foreach (string строка in cbargs)
+                {
+                    Console.WriteLine(строка);
+                }
                 break;
         }
-
     }
-
     private static IEnumerable<InlineKeyboardButton[]> CreateCalendar(Month mon)
     {
         var calendar = new InlineKeyboardButton[mon.Weeks + 3][];
@@ -224,7 +223,12 @@ class Program
                 {
                     if ((int)mon.Days[pos].Name == j)
                     {
-                        calendar[i][j] = InlineKeyboardButton.SetCallbackData($"{mon.Days[pos].Number}", $"{mon.Days[pos].Name}, {mon.Name} {mon.Days[pos].Number}");
+                        var day = mon.Days[pos];
+                        calendar[i][j] = InlineKeyboardButton.SetCallbackData(
+                            $"{day.Number}",
+                            $"day {mon.Year} {(ushort)mon.Name} {day.Number}"
+                        );
+                            //calendar[i][j] = InlineKeyboardButton.SetCallbackData($"{mon.Days[pos].Number}", $"{mon.Days[pos].Name}, {mon.Name} {mon.Days[pos].Number}");
                         pos++;
                     }
                     else
@@ -245,9 +249,9 @@ class Program
         var nextyear = nextmonth == MonthName.January ? mon.Year + 1 : mon.Year;
         calendar[^1][0] = InlineKeyboardButton.SetCallbackData($"{previousmonth}", $"month {previousyear} {((ushort)previousmonth)}");
         calendar[^1][1] = InlineKeyboardButton.SetCallbackData($"{nextmonth}", $"month {nextyear} {((ushort)nextmonth)}");
+
         return calendar;
     }
-
     private static InlineKeyboardButton[][] CreateCalendar(uint year)
     {
         var keyboard = new InlineKeyboardButton[6][];
@@ -330,7 +334,7 @@ public class Month
         firstday += month < 9 ? 0 : 30;
         firstday += month < 10 ? 0 : 31;
         firstday += month < 11 ? 0 : 30;
-        firstday = firstday % 7;
+        firstday %= 7;
         for (int i = 0; i < Days.Length; i++)
             Days[i] = new Day((DayName)((i + firstday) % 7), (ushort)(i + 1));
     }
