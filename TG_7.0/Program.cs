@@ -30,7 +30,7 @@ internal abstract class Program
                     {
                         case UpdateType.Message: OnMessage(update.Message, Bot, cancellationToken);
                             break;
-                        case UpdateType.CallbackQuery: OnCallbackQuery(update.CallbackQuery, Bot, cancellationToken, update.Message);
+                        case UpdateType.CallbackQuery: OnCallbackQuery(update.CallbackQuery, Bot, cancellationToken);
                             break;
                     }
                 }
@@ -164,7 +164,7 @@ internal abstract class Program
                 break;
         }
     }
-    private static async Task OnCallbackQuery(CallbackQuery query, BotClient bot, CancellationToken cancellationToken, Message message)
+    private static async Task OnCallbackQuery(CallbackQuery query, BotClient bot, CancellationToken cancellationToken)
     {
         if (query.Data == null) return;
         var cbargs = query.Data.Split(' ');
