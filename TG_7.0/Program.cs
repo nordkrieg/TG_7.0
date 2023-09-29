@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Polling;
+﻿using System.Threading;
+using Telegram.Bot.Polling;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableMethods.FormattingOptions;
@@ -29,7 +30,7 @@ internal abstract class Program
                     {
                         case UpdateType.Message: OnMessage(update.Message, Bot, cancellationToken);
                             break;
-                        case UpdateType.CallbackQuery: OnCallbackQuery(update.CallbackQuery);
+                        case UpdateType.CallbackQuery: OnCallbackQuery(update.CallbackQuery, Bot, cancellationToken, update.Message);
                             break;
                     }
                 }
@@ -43,8 +44,8 @@ internal abstract class Program
     }
     private static async Task OnMessage(Message message, BotClient bot, CancellationToken cancellationToken)
     {
-        //var aba = await UserCh.Task(message, bot, cancellationToken);
-        //if (aba) return;
+        var aba = await UserCh.Task(message, cancellationToken, bot);
+        if (aba) return;
         var moscowTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
         Console.WriteLine($"User: {message.Chat.Username}" + "\n" + $"Name: {message.Chat.FirstName}" + "\n" +
                           $"Surnameame: {message.Chat.LastName}" + "\n" + $"ID Chat: {message.Chat.Id}" + "\n" +
@@ -86,6 +87,10 @@ internal abstract class Program
                                 new KeyboardButton("Пары на завтра"),
                                 new KeyboardButton("Назад"),
                             },
+                            new[]
+                            {
+                                new KeyboardButton("Расписание пар на определённый день"),
+                            }
                         },
                         ResizeKeyboard = true
                     };
@@ -93,10 +98,10 @@ internal abstract class Program
                     break;
                 }
             case "Пары на завтра":
-                //await Pari(bot, cancellationToken, message, 1);
+                await OthersMethods.Pari(bot, cancellationToken, message, 1, null);
                 break;
             case "Пары на сегодня":
-                //await Pari(bot, cancellationToken, message, 0);
+                await OthersMethods.Pari(bot, cancellationToken, message, 0, null);
                 break;
             case "Капибара":
                 {
@@ -131,7 +136,7 @@ internal abstract class Program
                 await bot.SendMessageAsync(message.Chat.Id, "Поддержать разработчика: \n\n" + "СберБанк: `5469 4100 1429 4908`\n" + "ВТБ: `2200 2460 4327 6560`\n\n", parseMode: ParseMode.MarkdownV2, cancellationToken: cancellationToken);
                 break;
             case "Сообщить о баге":
-                await bot.SendMessageAsync(message.Chat.Id, "Сообщить об ошибке:\nTG: @n0rd_kr1eg\n" + "VK: https://vk.com/n0rd_kr1eg" + "\n\nВремя ответа: 5-15 минут", parseMode: ParseMode.MarkdownV2, cancellationToken: cancellationToken);
+                await bot.SendMessageAsync(message.Chat.Id, "Сообщить об ошибке:\nTG: @n0rd_kr1eg\n" + "VK: https://vk.com/n0rd_kr1eg" + "\n\nВремя ответа: 5-15 минут", cancellationToken: cancellationToken);
                 break;
             case "Инфа":
                 {
@@ -150,7 +155,7 @@ internal abstract class Program
                     await bot.SendMessageAsync(message.Chat.Id, "OK", replyMarkup: keyboard, cancellationToken: cancellationToken);
                     break;
                 }
-            case "Календарь":
+            case "Расписание пар на определённый день":
                 var rm = new InlineKeyboardMarkup
                 {
                     InlineKeyboard = CreateCalendar(2023)
@@ -159,7 +164,7 @@ internal abstract class Program
                 break;
         }
     }
-    private static void OnCallbackQuery(CallbackQuery query)
+    private static async Task OnCallbackQuery(CallbackQuery query, BotClient bot, CancellationToken cancellationToken, Message message)
     {
         if (query.Data == null) return;
         var cbargs = query.Data.Split(' ');
@@ -191,12 +196,7 @@ internal abstract class Program
                 });
                 break;
             case "day":
-                var selectedDay = cbargs[3];
-                Console.WriteLine($"Selected Day: {selectedDay}");
-                foreach (string строка in cbargs)
-                {
-                    Console.WriteLine(строка);
-                }
+                await OthersMethods.Pari(bot, cancellationToken, query.Message, 0, cbargs);
                 break;
         }
     }
@@ -228,7 +228,6 @@ internal abstract class Program
                             $"{day.Number}",
                             $"day {mon.Year} {(ushort)mon.Name} {day.Number}"
                         );
-                            //calendar[i][j] = InlineKeyboardButton.SetCallbackData($"{mon.Days[pos].Number}", $"{mon.Days[pos].Name}, {mon.Name} {mon.Days[pos].Number}");
                         pos++;
                     }
                     else

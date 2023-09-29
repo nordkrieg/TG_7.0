@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Flurl.Http" Version="3.2.4" />
     <PackageReference Include="Freeware.Pdf2Png" Version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="PdfLibCore" Version="2.5.0" />
@@ -16,6 +17,10 @@
     <PackageReference Include="Telegram.BotAPI" Version="6.9.0" />
     <PackageReference Include="Telegram.Bots.Extensions.Polling" Version="5.9.0" />
     
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Fold_data\sch_fold\" />
   </ItemGroup>
 
 </Project>
