@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading;
 using Telegram.Bot.Polling;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
@@ -64,7 +65,7 @@ internal abstract class Program
                             },
                             new[]{
                                 new KeyboardButton("Расписание звонков"),
-                                new KeyboardButton("Капибара"),
+                                new KeyboardButton("Рофлс"),
                                 new KeyboardButton("Календарь")
                             }
                         },
@@ -112,6 +113,33 @@ internal abstract class Program
                         await bot.SendPhotoAsync(message.Chat.Id, link, caption: $"{rand}/45", cancellationToken: cancellationToken);
                     break;
                 }
+            case "Шлёпа":
+                {
+                    var x = new Random();
+                    var rand = x.Next(1, 45);
+                    var link = File.ReadLines("../../../Fold_data/LinkBigRussianCat.txt").ElementAtOrDefault(rand);
+                    if (link != null)
+                        await bot.SendPhotoAsync(message.Chat.Id, link, caption: $"{rand}/45", cancellationToken: cancellationToken);
+                    break;
+                }
+            case "Рофлс":
+                {
+                    var keyboard = new ReplyKeyboardMarkup
+                    {
+                        Keyboard = new[]
+                        {
+                            new[]
+                            {
+                                new KeyboardButton("Шлёпа"),
+                                new KeyboardButton("Капибара"),
+                                new KeyboardButton("Назад")
+                            }
+                        },
+                        ResizeKeyboard = true
+                    };
+                    await bot.SendMessageAsync(message.Chat.Id, "несмешно", replyMarkup: keyboard, cancellationToken: cancellationToken);
+                    break;
+                }
             case "Назад":
                 {
                     var keyboard = new ReplyKeyboardMarkup
@@ -124,7 +152,7 @@ internal abstract class Program
                             },
                             new[]{
                                 new KeyboardButton("Расписание звонков"),
-                                new KeyboardButton("Капибара")
+                                new KeyboardButton("Рофлс")
                             }
                         },
                         ResizeKeyboard = true

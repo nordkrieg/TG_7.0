@@ -7,6 +7,7 @@ using Telegram.BotAPI.AvailableMethods;
 using File = System.IO.File;
 using Image = SixLabors.ImageSharp.Image;
 using InputFile = Telegram.BotAPI.AvailableTypes.InputFile;
+using InF = Telegram.Bot.Types;
 using System;
 
 namespace TG_7._0;
@@ -80,6 +81,7 @@ public abstract class OthersMethods
                 {
                     await botClient.SendPhotoAsync(message.Chat.Id, new InputFile(await File.ReadAllBytesAsync($"{pt}{day}.{month}.{year}-0.jpg", cancellationToken), $"{pt}{day}.{month}.{year}-0.jpg"), cancellationToken: cancellationToken);
                     await botClient.SendPhotoAsync(message.Chat.Id, new InputFile(await File.ReadAllBytesAsync($"{pt}{day}.{month}.{year}-1.jpg", cancellationToken), $"{pt}{day}.{month}.{year}-1.jpg"), cancellationToken: cancellationToken);
+
                     break;
                 }
                 await botClient.SendPhotoAsync(message.Chat.Id, new InputFile(await File.ReadAllBytesAsync($"{pt}{day}.{month}.{year}-0.jpg", cancellationToken), $"{pt}{day}.{month}.{year}-0.jpg"), cancellationToken: cancellationToken);
