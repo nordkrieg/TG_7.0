@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using Telegram.Bot.Polling;
+﻿using Telegram.Bot.Polling;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableMethods.FormattingOptions;
@@ -12,7 +11,6 @@ namespace TG_7._0;
 internal abstract class Program
 {
     private static readonly BotClient Bot = new("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
-
     private static void Main()
     {
         Console.WriteLine("Ужики я жив....");
@@ -28,9 +26,8 @@ internal abstract class Program
                 {
                     switch (update.Type)
                     {
-                        case UpdateType.Message: OnMessage(update.Message, Bot, cancellationToken);
-                            break;
-                        case UpdateType.CallbackQuery: OnCallbackQuery(update.CallbackQuery, Bot, cancellationToken, update.Message);
+                        case UpdateType.Message: OnMessage(update.Message, Bot, cancellationToken); break;
+                        case UpdateType.CallbackQuery: OnCallbackQuery(update.CallbackQuery, Bot, cancellationToken);
                             break;
                     }
                 }
@@ -64,7 +61,7 @@ internal abstract class Program
                             },
                             new[]{
                                 new KeyboardButton("Расписание звонков"),
-                                new KeyboardButton("Капибара"),
+                                new KeyboardButton("Рофлс"),
                                 new KeyboardButton("Календарь")
                             }
                         },
@@ -112,6 +109,33 @@ internal abstract class Program
                         await bot.SendPhotoAsync(message.Chat.Id, link, caption: $"{rand}/45", cancellationToken: cancellationToken);
                     break;
                 }
+            case "Шлёпа":
+                {
+                    var x = new Random();
+                    var rand = x.Next(1, 45);
+                    var link = File.ReadLines("../../../Fold_data/LinkBigRussianCat.txt").ElementAtOrDefault(rand);
+                    if (link != null)
+                        await bot.SendPhotoAsync(message.Chat.Id, link, caption: $"{rand}/45", cancellationToken: cancellationToken);
+                    break;
+                }
+            case "Рофлс":
+                {
+                    var keyboard = new ReplyKeyboardMarkup
+                    {
+                        Keyboard = new[]
+                        {
+                            new[]
+                            {
+                                new KeyboardButton("Шлёпа"),
+                                new KeyboardButton("Капибара"),
+                                new KeyboardButton("Назад")
+                            }
+                        },
+                        ResizeKeyboard = true
+                    };
+                    await bot.SendMessageAsync(message.Chat.Id, "несмешно", replyMarkup: keyboard, cancellationToken: cancellationToken);
+                    break;
+                }
             case "Назад":
                 {
                     var keyboard = new ReplyKeyboardMarkup
@@ -124,7 +148,7 @@ internal abstract class Program
                             },
                             new[]{
                                 new KeyboardButton("Расписание звонков"),
-                                new KeyboardButton("Капибара")
+                                new KeyboardButton("Рофлс")
                             }
                         },
                         ResizeKeyboard = true
@@ -164,7 +188,7 @@ internal abstract class Program
                 break;
         }
     }
-    private static async Task OnCallbackQuery(CallbackQuery query, BotClient bot, CancellationToken cancellationToken, Message message)
+    private static async Task OnCallbackQuery(CallbackQuery query, BotClient bot, CancellationToken cancellationToken)
     {
         if (query.Data == null) return;
         var cbargs = query.Data.Split(' ');
