@@ -71,23 +71,20 @@ public abstract class OthersMethods
             {
                 if (File.Exists($"{pt}{day}.{month}.{year}-1.jpg"))
                 {
-                    var fs1 = new FileStream($"{pt}{day}.{month}.{year}-0.jpg", FileMode.Open, FileAccess.Read);
-                    var br1 = new BinaryReader(fs1);
-                    var filebytes1 = br1.ReadBytes((int)fs1.Length);
-                    var fs2 = new FileStream($"{pt}{day}.{month}.{year}-1.jpg", FileMode.Open, FileAccess.Read);
-                    var br2 = new BinaryReader(fs2);
-                    var filebytes2 = br2.ReadBytes((int)fs2.Length);
-                    var file1 = new InputFile(filebytes1, "odin.jpg");
-                    var file2 = new InputFile(filebytes2, "dva.jpg");
+                    var fs_arr = new[] { new FileStream($"{pt}{day}.{month}.{year}-0.jpg", FileMode.Open, FileAccess.Read), new FileStream($"{pt}{day}.{month}.{year}-1.jpg", FileMode.Open, FileAccess.Read) };
+                    var br_arr = new[] { new BinaryReader(fs_arr[0]), new BinaryReader(fs_arr[1]) };
+                    var filebytes_arr = new[] { br_arr[0].ReadBytes((int)fs_arr[0].Length), br_arr[1].ReadBytes((int)fs_arr[1].Length) };
+                    var file1 = new InputFile(filebytes_arr[0], $"{pt}{day}.{month}.{year}-0.jpg");
+                    var file2 = new InputFile(filebytes_arr[1], $"{pt}{day}.{month}.{year}-1.jpg");
                     var files = new[]
                     {
-                        new AttachedFile("odin.jpg", file1),
-                        new AttachedFile("dva.jpg", file2)
+                        new AttachedFile($"{pt}{day}.{month}.{year}-0.jpg", file1),
+                        new AttachedFile($"{pt}{day}.{month}.{year}-1.jpg", file2)
                     };
                     await botClient.SendMediaGroupAsync(message.Chat.Id, new[]
                     {
-                        new InputMediaPhoto("attach://odin.jpg"), 
-                        new InputMediaPhoto("attach://dva.jpg")
+                        new InputMediaPhoto($"attach://{pt}{day}.{month}.{year}-0.jpg"), 
+                        new InputMediaPhoto($"attach://{pt}{day}.{month}.{year}-1.jpg")
                     }, 
                         attachedFiles: files, cancellationToken: cancellationToken);
                     break;

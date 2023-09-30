@@ -1,9 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
-using Telegram.BotAPI.AvailableMethods.FormattingOptions;
 using Telegram.BotAPI.AvailableTypes;
-using Telegram.BotAPI.GettingUpdates;
 using Telegram.BotAPI.UpdatingMessages;
 namespace TG_7._0;
 internal abstract class UserCh { 
