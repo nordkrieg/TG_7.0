@@ -7,8 +7,6 @@ using Telegram.BotAPI.AvailableMethods;
 using File = System.IO.File;
 using Image = SixLabors.ImageSharp.Image;
 using InputFile = Telegram.BotAPI.AvailableTypes.InputFile;
-using InF = Telegram.Bot.Types;
-using System;
 
 namespace TG_7._0;
 public abstract class OthersMethods
@@ -42,7 +40,7 @@ public abstract class OthersMethods
 
     public static async Task Pari(BotClient botClient, CancellationToken cancellationToken, Message message, int x, string[] days)
     {
-        string day, month, year, temn_month;
+        string day, month, year;
         var moscowTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
         if (days != null)
         {
@@ -61,38 +59,48 @@ public abstract class OthersMethods
             if (day[0] == '0') day = day.TrimStart('0');
         }
         var pt = "../../../Fold_data/sch_fold/" + day + "." + month + "." + year + "/";
-        switch (month)
+        var temnMonth = month switch
         {
-            case "10":
-                temn_month = "09";
-                break;
-            case "06":
-                temn_month = "05";
-                break;
-            default:
-                temn_month = month;
-                break;
-        }
+            "10" => "09",
+            "11" => "10",
+            _ => month
+        };
         while (true)
         {
             if (Directory.Exists(pt))
             {
                 if (File.Exists($"{pt}{day}.{month}.{year}-1.jpg"))
                 {
-                    await botClient.SendPhotoAsync(message.Chat.Id, new InputFile(await File.ReadAllBytesAsync($"{pt}{day}.{month}.{year}-0.jpg", cancellationToken), $"{pt}{day}.{month}.{year}-0.jpg"), cancellationToken: cancellationToken);
-                    await botClient.SendPhotoAsync(message.Chat.Id, new InputFile(await File.ReadAllBytesAsync($"{pt}{day}.{month}.{year}-1.jpg", cancellationToken), $"{pt}{day}.{month}.{year}-1.jpg"), cancellationToken: cancellationToken);
-
+                    var fs1 = new FileStream($"{pt}{day}.{month}.{year}-0.jpg", FileMode.Open, FileAccess.Read);
+                    var br1 = new BinaryReader(fs1);
+                    var filebytes1 = br1.ReadBytes((int)fs1.Length);
+                    var fs2 = new FileStream($"{pt}{day}.{month}.{year}-1.jpg", FileMode.Open, FileAccess.Read);
+                    var br2 = new BinaryReader(fs2);
+                    var filebytes2 = br2.ReadBytes((int)fs2.Length);
+                    var file1 = new InputFile(filebytes1, "odin.jpg");
+                    var file2 = new InputFile(filebytes2, "dva.jpg");
+                    var files = new[]
+                    {
+                        new AttachedFile("odin.jpg", file1),
+                        new AttachedFile("dva.jpg", file2)
+                    };
+                    await botClient.SendMediaGroupAsync(message.Chat.Id, new[]
+                    {
+                        new InputMediaPhoto("attach://odin.jpg"), 
+                        new InputMediaPhoto("attach://dva.jpg")
+                    }, 
+                        attachedFiles: files, cancellationToken: cancellationToken);
                     break;
                 }
                 await botClient.SendPhotoAsync(message.Chat.Id, new InputFile(await File.ReadAllBytesAsync($"{pt}{day}.{month}.{year}-0.jpg", cancellationToken), $"{pt}{day}.{month}.{year}-0.jpg"), cancellationToken: cancellationToken);
                 break;
             }
             else{
-                var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{year}/{temn_month}/{day}.{month}.{year}.pdf");
+                var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf");
                 if (urlCheckResult)
                 {
                     Directory.CreateDirectory(pt);
-                    await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{temn_month}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime);
+                    await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime);
                     await ConvertPdFtoHojas($"{pt}", day, month, year);
                     continue;
                 }

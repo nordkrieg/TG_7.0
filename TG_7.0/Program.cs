@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using Telegram.Bot.Polling;
+﻿using Telegram.Bot.Polling;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableMethods.FormattingOptions;
@@ -13,7 +11,6 @@ namespace TG_7._0;
 internal abstract class Program
 {
     private static readonly BotClient Bot = new("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
-
     private static void Main()
     {
         Console.WriteLine("Ужики я жив....");
@@ -29,8 +26,7 @@ internal abstract class Program
                 {
                     switch (update.Type)
                     {
-                        case UpdateType.Message: OnMessage(update.Message, Bot, cancellationToken);
-                            break;
+                        case UpdateType.Message: OnMessage(update.Message, Bot, cancellationToken); break;
                         case UpdateType.CallbackQuery: OnCallbackQuery(update.CallbackQuery, Bot, cancellationToken);
                             break;
                     }
