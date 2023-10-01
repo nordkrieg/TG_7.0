@@ -16,7 +16,7 @@ internal abstract class Program
         var cts = new CancellationTokenSource();
         while (true)
         {
-            var updates = await Bot.GetUpdatesAsync();
+            var updates = await Bot.GetUpdatesAsync().ConfigureAwait(true);
             if (updates.Length > 0)
             {
                 foreach (var update in updates)
@@ -24,23 +24,23 @@ internal abstract class Program
                     switch (update.Type)
                     {
                         case UpdateType.Message:
-                            await OnMessage(update.Message, cts.Token);
+                            await OnMessage(update.Message, cts.Token).ConfigureAwait(true);
                             break;
                         case UpdateType.CallbackQuery:
-                            await OnCallbackQuery(update.CallbackQuery, cts.Token);
+                            await OnCallbackQuery(update.CallbackQuery, cts.Token).ConfigureAwait(true);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
                 }
-                await Bot.GetUpdatesAsync(offset: updates.Max(u => u.UpdateId) + 1, cancellationToken: cts.Token);
+                await Bot.GetUpdatesAsync(offset: updates.Max(u => u.UpdateId) + 1, cancellationToken: cts.Token).ConfigureAwait(true);
             }
-            else await Bot.GetUpdatesAsync();
+            else await Bot.GetUpdatesAsync().ConfigureAwait(true);
         }
     }
     private static async Task OnMessage(Message message, CancellationToken cancellationToken)
     {
-        if (await UserCh.Task(message, cancellationToken, Bot)) return;
+        if (await UserCh.Task(message, cancellationToken, Bot).ConfigureAwait(true)) return;
         var moscowTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
             TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
         Console.WriteLine($"User: {message.Chat.Username}\n" + $"Name: {message.Chat.FirstName}\n" +
@@ -49,43 +49,43 @@ internal abstract class Program
         switch (message.Text)
         {
             case "/start":
-                await HandleStartCommand(message.Chat.Id, cancellationToken);
+                await HandleStartCommand(message.Chat.Id, cancellationToken).ConfigureAwait(true);
                 break;
             case "Расписание звонков":
-                await SendCallSchedule(message.Chat.Id, cancellationToken);
+                await SendCallSchedule(message.Chat.Id, cancellationToken).ConfigureAwait(true);
                 break;
             case "Расписание пар":
-                await HandleScheduleCommand(message.Chat.Id, cancellationToken);
+                await HandleScheduleCommand(message.Chat.Id, cancellationToken).ConfigureAwait(true);
                 break;
             case "Пары на завтра":
-                await OthersMethods.Pari(Bot, cancellationToken, message, 1, null);
+                await OthersMethods.Pari(Bot, cancellationToken, message, 1, null).ConfigureAwait(true);
                 break;
             case "Пары на сегодня":
-                await OthersMethods.Pari(Bot, cancellationToken, message, 0, null);
+                await OthersMethods.Pari(Bot, cancellationToken, message, 0, null).ConfigureAwait(true);
                 break;
             case "Капибара":
-                await SendRandomImage(message.Chat.Id, "LinkCapybara.txt", cancellationToken);
+                await SendRandomImage(message.Chat.Id, "LinkCapybara.txt", cancellationToken).ConfigureAwait(true);
                 break;
             case "Шлёпа":
-                await SendRandomImage(message.Chat.Id, "LinkBigRussianCat.txt", cancellationToken);
+                await SendRandomImage(message.Chat.Id, "LinkBigRussianCat.txt", cancellationToken).ConfigureAwait(true);
                 break;
             case "Рофлс":
-                await HandleRoflsCommand(message.Chat.Id, cancellationToken);
+                await HandleRoflsCommand(message.Chat.Id, cancellationToken).ConfigureAwait(true);
                 break;
             case "Назад":
-                await HandleStartCommand(message.Chat.Id, cancellationToken);
+                await HandleStartCommand(message.Chat.Id, cancellationToken).ConfigureAwait(true);
                 break;
             case "Поддержка":
-                await SendSupportInfo(message.Chat.Id, cancellationToken);
+                await SendSupportInfo(message.Chat.Id, cancellationToken).ConfigureAwait(true);
                 break;
             case "Сообщить о баге":
-                await SendBugReportInfo(message.Chat.Id, cancellationToken);
+                await SendBugReportInfo(message.Chat.Id, cancellationToken).ConfigureAwait(true);
                 break;
             case "Инфа":
-                await HandleInfoCommand(message.Chat.Id, cancellationToken);
+                await HandleInfoCommand(message.Chat.Id, cancellationToken).ConfigureAwait(true);
                 break;
             case "Расписание пар на определённый день":
-                await SendCalendar(message.Chat.Id, cancellationToken);
+                await SendCalendar(message.Chat.Id, cancellationToken).ConfigureAwait(true);
                 break;
         }
     }
@@ -108,13 +108,13 @@ internal abstract class Program
             },
             ResizeKeyboard = true
         };
-        await Bot.SendMessageAsync(chatId, "OK", replyMarkup: keyboard, cancellationToken: cancellationToken);
+        await Bot.SendMessageAsync(chatId, "OK", replyMarkup: keyboard, cancellationToken: cancellationToken).ConfigureAwait(true);
     }
     private static async Task SendCallSchedule(long chatId, CancellationToken cancellationToken)
     {
         await Bot.SendPhotoAsync(chatId,
             "https://sun9-77.userapi.com/impg/as1MA-6kTJiBgNaTzlJchVz9WIdRuTZt9uNJpQ/2kp1pa0vxL4.jpg?size=994x467&quality=96&sign=87102e4153f1c047a2012aa21487f1cb&type=album",
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken).ConfigureAwait(true);
     }
     private static async Task HandleScheduleCommand(long chatId, CancellationToken cancellationToken)
     {
@@ -135,7 +135,7 @@ internal abstract class Program
             },
             ResizeKeyboard = true
         };
-        await Bot.SendMessageAsync(chatId, "OK", replyMarkup: keyboard, cancellationToken: cancellationToken);
+        await Bot.SendMessageAsync(chatId, "OK", replyMarkup: keyboard, cancellationToken: cancellationToken).ConfigureAwait(true);
     }
     private static async Task SendRandomImage(long chatId, string fileName, CancellationToken cancellationToken)
     {
@@ -143,7 +143,7 @@ internal abstract class Program
         var rand = x.Next(1, 45);
         var link = File.ReadLines($"../../../Fold_data/{fileName}").ElementAtOrDefault(rand);
         if (link != null)
-            await Bot.SendPhotoAsync(chatId, link, caption: $"{rand}/45", cancellationToken: cancellationToken);
+            await Bot.SendPhotoAsync(chatId, link, caption: $"{rand}/45", cancellationToken: cancellationToken).ConfigureAwait(true);
     }
     private static async Task HandleRoflsCommand(long chatId, CancellationToken cancellationToken)
     {
@@ -160,18 +160,18 @@ internal abstract class Program
             },
             ResizeKeyboard = true
         };
-        await Bot.SendMessageAsync(chatId, "несмешно", replyMarkup: keyboard, cancellationToken: cancellationToken);
+        await Bot.SendMessageAsync(chatId, "несмешно", replyMarkup: keyboard, cancellationToken: cancellationToken).ConfigureAwait(true);
     }
     private static async Task SendSupportInfo(long chatId, CancellationToken cancellationToken)
     {
         await Bot.SendMessageAsync(chatId, "Поддержать разработчика: \n\n" + "СберБанк: `5469 4100 1429 4908`\n" + "ВТБ: `2200 2460 4327 6560`\n\n", parseMode: ParseMode.MarkdownV2,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken).ConfigureAwait(true);
     }
     private static async Task SendBugReportInfo(long chatId, CancellationToken cancellationToken)
     {
         const string bugReportInfo = "Сообщить об ошибке:\nTG: @n0rd_kr1eg\n" + "VK: https://vk.com/n0rd_kr1eg\n\n" +
                                      "Время ответа: 5-15 минут";
-        await Bot.SendMessageAsync(chatId, bugReportInfo, cancellationToken: cancellationToken);
+        await Bot.SendMessageAsync(chatId, bugReportInfo, cancellationToken: cancellationToken).ConfigureAwait(true);
     }
     private static async Task HandleInfoCommand(long chatId, CancellationToken cancellationToken)
     {
@@ -188,12 +188,12 @@ internal abstract class Program
             },
             ResizeKeyboard = true
         };
-        await Bot.SendMessageAsync(chatId, "OK", replyMarkup: keyboard, cancellationToken: cancellationToken);
+        await Bot.SendMessageAsync(chatId, "OK", replyMarkup: keyboard, cancellationToken: cancellationToken).ConfigureAwait(true);
     }
     private static async Task SendCalendar(long chatId, CancellationToken cancellationToken)
     {
         var calendarMarkup = CreateCalendarMarkup(2023);
-        await Bot.SendMessageAsync(chatId, "🗓 <b>Telegram Bot Calendar</b> 🗓", parseMode: ParseMode.HTML, replyMarkup: calendarMarkup, cancellationToken: cancellationToken);
+        await Bot.SendMessageAsync(chatId, "🗓 <b>Telegram Bot Calendar</b> 🗓", parseMode: ParseMode.HTML, replyMarkup: calendarMarkup, cancellationToken: cancellationToken).ConfigureAwait(true);
     }
     private static async Task OnCallbackQuery(CallbackQuery query, CancellationToken cancellationToken)
     {
@@ -204,12 +204,12 @@ internal abstract class Program
             case "month":
                 var month = new Month((MonthName)Enum.Parse(typeof(MonthName), cbargs[2]), uint.Parse(cbargs[1]));
                 var monthCalendarMarkup = CreateCalendarMarkup(month);
-                await EditMessageReplyMarkup(query, monthCalendarMarkup);
+                await EditMessageReplyMarkup(query, monthCalendarMarkup).ConfigureAwait(true);
                 break;
             case "year":
                 var year = uint.Parse(cbargs[1]);
                 var yearCalendarMarkup = CreateCalendarMarkup(year);
-                await EditMessageReplyMarkup(query, yearCalendarMarkup);
+                await EditMessageReplyMarkup(query, yearCalendarMarkup).ConfigureAwait(true);
                 break;
             case "day":
                 await OthersMethods.Pari(Bot, cancellationToken, query.Message, 0, cbargs).ConfigureAwait(false);

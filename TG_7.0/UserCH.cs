@@ -15,8 +15,8 @@ internal abstract class UserCh {
         if (message == null) return true;
         if (BannedUserIds.Contains((int)message.Chat.Id))
         {
-            await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId, cancellationToken: cancellationToken);
-            await botClient.SendMessageAsync(message.Chat.Id, "Ваше сообщение было удалено, а вы заблокированы", cancellationToken: cancellationToken);
+            await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId, cancellationToken: cancellationToken).ConfigureAwait(true);
+            await botClient.SendMessageAsync(message.Chat.Id, "Ваше сообщение было удалено, а вы заблокированы", cancellationToken: cancellationToken).ConfigureAwait(true);
             Console.WriteLine("Сообщение от забаненного пользователя: " + message.Chat.Id);
             return true;
         }
@@ -29,8 +29,8 @@ internal abstract class UserCh {
         if (!IsSpamming(message)) return false;
         Console.WriteLine($"Сообщение от пользователя {message.From.Id} отклонено из-за спама: {message.Text}");
         BlockUser(message.From.Id);
-        await botClient.SendPhotoAsync(message.Chat.Id, "https://steamuserimages-a.akamaihd.net/ugc/956346433289890009/369C4E7EA8C212D161EDF7840539C0F3F8FFE505/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false", cancellationToken: cancellationToken);
-        await BlockAndDeleteMessageAsync(message, botClient);
+        await botClient.SendPhotoAsync(message.Chat.Id, "https://steamuserimages-a.akamaihd.net/ugc/956346433289890009/369C4E7EA8C212D161EDF7840539C0F3F8FFE505/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false", cancellationToken: cancellationToken).ConfigureAwait(true);
+        await BlockAndDeleteMessageAsync(message, botClient).ConfigureAwait(true);
         return true;
     }
     private static bool IsSpamming(Message message)
@@ -63,8 +63,7 @@ internal abstract class UserCh {
     private static async Task BlockAndDeleteMessageAsync(Message message, BotClient botClient)
     {
         BlockUser(message.From!.Id);
-        await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-        await botClient.SendMessageAsync(message.Chat.Id, "Ваше сообщение было удалено, и вы временно заблокированы");
+        await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId).ConfigureAwait(true);
+        await botClient.SendMessageAsync(message.Chat.Id, "Ваше сообщение было удалено, и вы временно заблокированы").ConfigureAwait(true);
     }
-
 }

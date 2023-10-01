@@ -16,7 +16,7 @@ public abstract class OthersMethods
         using var client = new HttpClient();
         try
         {
-            var response = await client.GetAsync(url);
+            var response = await client.GetAsync(url).ConfigureAwait(true);
             return response.IsSuccessStatusCode;
         }
         catch (HttpRequestException)
@@ -31,10 +31,10 @@ public abstract class OthersMethods
         var month = date.Month.ToString();
         if (Convert.ToInt32(month) < 10) _ = "0" + month;
         if (day[0] == '0')  _ = day.TrimStart('0');
-        if (await CheckUrl(url))
+        if (await CheckUrl(url).ConfigureAwait(true))
         {
-            var fileBytes = await client.GetByteArrayAsync(url);
-            await File.WriteAllBytesAsync(path, fileBytes);
+            var fileBytes = await client.GetByteArrayAsync(url).ConfigureAwait(true);
+            await File.WriteAllBytesAsync(path, fileBytes).ConfigureAwait(true);
         }
     }
 
@@ -86,21 +86,21 @@ public abstract class OthersMethods
                         new InputMediaPhoto($"attach://{pt}{day}.{month}.{year}-0.jpg"), 
                         new InputMediaPhoto($"attach://{pt}{day}.{month}.{year}-1.jpg")
                     }, 
-                        attachedFiles: files, cancellationToken: cancellationToken);
+                        attachedFiles: files, cancellationToken: cancellationToken).ConfigureAwait(true);
                     break;
                 }
-                await botClient.SendPhotoAsync(message.Chat.Id, new InputFile(await File.ReadAllBytesAsync($"{pt}{day}.{month}.{year}-0.jpg", cancellationToken), $"{pt}{day}.{month}.{year}-0.jpg"), cancellationToken: cancellationToken);
+                await botClient.SendPhotoAsync(message.Chat.Id, new InputFile(await File.ReadAllBytesAsync($"{pt}{day}.{month}.{year}-0.jpg", cancellationToken).ConfigureAwait(true), $"{pt}{day}.{month}.{year}-0.jpg"), cancellationToken: cancellationToken);
             }
             else{
-                var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf");
+                var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf").ConfigureAwait(true);
                 if (urlCheckResult)
                 {
                     Directory.CreateDirectory(pt);
-                    await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime);
-                    await ConvertPdFtoHojas($"{pt}", day, month, year);
+                    await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime).ConfigureAwait(true);
+                    await ConvertPdFtoHojas($"{pt}", day, month, year).ConfigureAwait(true);
                     continue;
                 }
-                await botClient.SendMessageAsync(message.Chat.Id, "Расписания на " + day + "." + month + "." + year + " нет", cancellationToken: cancellationToken);
+                await botClient.SendMessageAsync(message.Chat.Id, "Расписания на " + day + "." + month + "." + year + " нет", cancellationToken: cancellationToken).ConfigureAwait(true);
             }
             break;
         }
@@ -118,13 +118,12 @@ public abstract class OthersMethods
             byte[] byteArray;
             using (var memoryStream = new MemoryStream())
             {
-                await bitmap.AsBmpStream(1 , 1).CopyToAsync(memoryStream);
+                await bitmap.AsBmpStream(1 , 1).CopyToAsync(memoryStream).ConfigureAwait(true);
                 byteArray = memoryStream.ToArray();
             }
-            await File.WriteAllBytesAsync(path + day + "." + month + "." + year + $"-{i}.png", byteArray);
-            var image1 = await Image.LoadAsync($"{path}{day}.{month}.{year}-{i}.png");
-            var encoder = new JpegEncoder { Quality = 100 };
-            await image1.SaveAsync($"{path}{day}.{month}.{year}-{i}.jpg", encoder);
+            await File.WriteAllBytesAsync(path + day + "." + month + "." + year + $"-{i}.png", byteArray).ConfigureAwait(true);
+            var image1 = await Image.LoadAsync($"{path}{day}.{month}.{year}-{i}.png").ConfigureAwait(true);
+            await image1.SaveAsync($"{path}{day}.{month}.{year}-{i}.jpg", new JpegEncoder { Quality = 100 }).ConfigureAwait(true);
             File.Delete(path + day + "." + month + "." + year + $"-{i}.png");
         }
         File.Delete(path + day + "." + month + "." + year + ".pdf");
