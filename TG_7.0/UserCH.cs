@@ -39,7 +39,7 @@ internal abstract class UserCh {
     }
     private static bool IsSpamming(Message message)
     {
-        if (!MessageTimes.TryGetValue(message.From.Id, out var messageQueue))
+        if (!MessageTimes.TryGetValue(message.From!.Id, out var messageQueue))
         {
             messageQueue = new Queue<DateTime>();
             MessageTimes[message.From.Id] = messageQueue;

@@ -202,7 +202,7 @@ internal abstract class Program
                 };
                 Bot.EditMessageReplyMarkup<Message>(new EditMessageReplyMarkup
                 {
-                    ChatId = query.Message.Chat.Id,
+                    ChatId = query.Message!.Chat.Id,
                     MessageId = query.Message.MessageId,
                     ReplyMarkup = mkeyboard
                 });
@@ -214,7 +214,7 @@ internal abstract class Program
                 };
                 Bot.EditMessageReplyMarkup<Message>(new EditMessageReplyMarkup
                 {
-                    ChatId = query.Message.Chat.Id,
+                    ChatId = query.Message!.Chat.Id,
                     MessageId = query.Message.MessageId,
                     ReplyMarkup = ykeyboard
                 });
@@ -228,41 +228,35 @@ internal abstract class Program
     {
         var calendar = new InlineKeyboardButton[mon.Weeks + 3][];
         var pos = 0;
-        calendar[0] = new InlineKeyboardButton[1]
+        calendar[0] = new[]
         {
-            InlineKeyboardButton.SetCallbackData($"{mon.Name} {mon.Year}", $"year {mon.Year}")
+            InlineButtonBuilder.SetCallbackData($"{mon.Name} {mon.Year}", $"year {mon.Year}")
         };
         var days = new[] { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" };
         calendar[1] = new InlineKeyboardButton[7];
-        for (int i = 0; i < 7; i++)
+        for (var i = 0; i < 7; i++)
         {
-            calendar[1][i] = InlineKeyboardButton.SetCallbackData(days[i], $"{((DayName)i)}");
+            calendar[1][i] = InlineButtonBuilder.SetCallbackData(days[i], $"{((DayName)i)}");
         }
-        for (int i = 2; i < mon.Weeks + 2; i++)
+        for (var i = 2; i < mon.Weeks + 2; i++)
         {
             calendar[i] = new InlineKeyboardButton[7];
-            for (int j = 0; j < 7; j++)
+            for (var j = 0; j < 7; j++)
             {
                 if (pos < mon.Days.Length)
                 {
                     if ((int)mon.Days[pos].Name == j)
                     {
                         var day = mon.Days[pos];
-                        calendar[i][j] = InlineKeyboardButton.SetCallbackData(
+                        calendar[i][j] = InlineButtonBuilder.SetCallbackData(
                             $"{day.Number}",
                             $"day {mon.Year} {(ushort)mon.Name} {day.Number}"
                         );
                         pos++;
                     }
-                    else
-                    {
-                        calendar[i][j] = InlineKeyboardButton.SetCallbackData("*", "Empty day");
-                    }
+                    else calendar[i][j] = InlineButtonBuilder.SetCallbackData("*", "Empty day");
                 }
-                else
-                {
-                    calendar[i][j] = InlineKeyboardButton.SetCallbackData("*", "Empty day");
-                }
+                else calendar[i][j] = InlineButtonBuilder.SetCallbackData("*", "Empty day");
             }
         }
         calendar[^1] = new InlineKeyboardButton[2];
@@ -270,21 +264,21 @@ internal abstract class Program
         var nextmonth = mon.Name == MonthName.December ? MonthName.January : mon.Name + 1;
         var previousyear = previousmonth == MonthName.December ? mon.Year - 1 : mon.Year;
         var nextyear = nextmonth == MonthName.January ? mon.Year + 1 : mon.Year;
-        calendar[^1][0] = InlineKeyboardButton.SetCallbackData($"{previousmonth}", $"month {previousyear} {((ushort)previousmonth)}");
-        calendar[^1][1] = InlineKeyboardButton.SetCallbackData($"{nextmonth}", $"month {nextyear} {((ushort)nextmonth)}");
+        calendar[^1][0] = InlineButtonBuilder.SetCallbackData($"{previousmonth}", $"month {previousyear} {((ushort)previousmonth)}");
+        calendar[^1][1] = InlineButtonBuilder.SetCallbackData($"{nextmonth}", $"month {nextyear} {((ushort)nextmonth)}");
 
         return calendar;
     }
-    private static InlineKeyboardButton[][] CreateCalendar(uint year)
+    private static IEnumerable<InlineKeyboardButton[]> CreateCalendar(uint year)
     {
         var keyboard = new InlineKeyboardButton[6][];
-        keyboard[0] = new InlineKeyboardButton[1]{
-            InlineKeyboardButton.SetCallbackData($"{year}", $"Year {year}")
+        keyboard[0] = new[]{
+            InlineButtonBuilder.SetCallbackData($"{year}", $"Year {year}")
         };
         for (int i = 1, n = 0; i < 5; i++)
         {
             keyboard[i] = new InlineKeyboardButton[3];
-            for (int j = 0; j < 3; j++, n++)
+            for (var j = 0; j < 3; j++, n++)
             {
                 var month = (MonthName)n;
                 keyboard[i][j] = new InlineKeyboardButton
@@ -294,9 +288,9 @@ internal abstract class Program
                 };
             }
         }
-        keyboard[5] = new InlineKeyboardButton[2]{
-            InlineKeyboardButton.SetCallbackData($"{year - 1}",$"year {year - 1}"),
-            InlineKeyboardButton.SetCallbackData($"{year + 1}",$"year {year + 1}")
+        keyboard[5] = new[]{
+            InlineButtonBuilder.SetCallbackData($"{year - 1}",$"year {year - 1}"),
+            InlineButtonBuilder.SetCallbackData($"{year + 1}",$"year {year + 1}")
         };
         return keyboard;
     }
