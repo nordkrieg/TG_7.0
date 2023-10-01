@@ -95,17 +95,15 @@ public abstract class OthersMethods
                 await botClient.SendPhotoAsync(message.Chat.Id, new InputFile(await File.ReadAllBytesAsync($"{pt}{day}.{month}.{year}-0.jpg", cancellationToken), $"{pt}{day}.{month}.{year}-0.jpg"), cancellationToken: cancellationToken);
                 break;
             }
-            else{
-                var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf");
-                if (urlCheckResult)
-                {
-                    Directory.CreateDirectory(pt);
-                    await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime);
-                    await ConvertPdFtoHojas($"{pt}", day, month, year);
-                    continue;
-                }
-                await botClient.SendMessageAsync(message.Chat.Id, $"Расписания на " + day + "." + month + "." + year + " нет", cancellationToken: cancellationToken);
+            var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf");
+            if (urlCheckResult)
+            {
+                Directory.CreateDirectory(pt);
+                await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime);
+                await ConvertPdFtoHojas($"{pt}", day, month, year);
+                continue;
             }
+            await botClient.SendMessageAsync(message.Chat.Id, "Расписания на " + day + "." + month + "." + year + " нет", cancellationToken: cancellationToken);
             break;
         }
     }
@@ -115,8 +113,8 @@ public abstract class OthersMethods
         using var pagesi = pdfDocument;
         for (var i = 0; i < pagesi.Pages.Count; i++)
         {
-            var pageWidth = (pagesi.Pages[i].Size.Width);
-            var pageHeight = (pagesi.Pages[i].Size.Height);
+            var pageWidth = pagesi.Pages[i].Size.Width;
+            var pageHeight = pagesi.Pages[i].Size.Height;
             using var bitmap = new PdfiumBitmap((int)pageWidth, (int)pageHeight, false);
             pagesi.Pages[i].Render(bitmap, PageOrientations.Normal, RenderingFlags.LcdText);
             byte[] byteArray;
@@ -125,7 +123,7 @@ public abstract class OthersMethods
                 await bitmap.AsBmpStream(1 , 1).CopyToAsync(memoryStream);
                 byteArray = memoryStream.ToArray();
             }
-            await File.WriteAllBytesAsync((path + day + "." + month + "." + year + $"-{i}.png"), byteArray);
+            await File.WriteAllBytesAsync(path + day + "." + month + "." + year + $"-{i}.png", byteArray);
             var image1 = await Image.LoadAsync($"{path}{day}.{month}.{year}-{i}.png");
             var encoder = new JpegEncoder { Quality = 100 };
             await image1.SaveAsync($"{path}{day}.{month}.{year}-{i}.jpg", encoder);

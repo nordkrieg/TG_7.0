@@ -1,9 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
-using Telegram.BotAPI.AvailableMethods.FormattingOptions;
 using Telegram.BotAPI.AvailableTypes;
-using Telegram.BotAPI.GettingUpdates;
 using Telegram.BotAPI.UpdatingMessages;
 namespace TG_7._0;
 internal abstract class UserCh { 
@@ -22,20 +20,17 @@ internal abstract class UserCh {
             Console.WriteLine("Сообщение от забаненного пользователя: " + message.Chat.Id);
             return true;
         }
-        if (IsUserBlocked(message.From.Id))
+        if (IsUserBlocked(message.From!.Id))
         {
             Console.WriteLine($"Сообщение от замученого пользователя {message.From.Id} не обрабатывается: {message.Text}");
             return true;
         }
-        if (IsSpamming(message))
-        {
-            Console.WriteLine($"Сообщение от пользователя {message.From.Id} отклонено из-за спама: {message.Text}");
-            BlockUser(message.From.Id);
-            await botClient.SendPhotoAsync(message.Chat.Id, "https://steamuserimages-a.akamaihd.net/ugc/956346433289890009/369C4E7EA8C212D161EDF7840539C0F3F8FFE505/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false", cancellationToken: cancellationToken);
-            await BlockAndDeleteMessageAsync(message, botClient);
-            return true;
-        }
-        return false;
+        if (!IsSpamming(message)) return false;
+        Console.WriteLine($"Сообщение от пользователя {message.From.Id} отклонено из-за спама: {message.Text}");
+        BlockUser(message.From.Id);
+        await botClient.SendPhotoAsync(message.Chat.Id, "https://steamuserimages-a.akamaihd.net/ugc/956346433289890009/369C4E7EA8C212D161EDF7840539C0F3F8FFE505/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false", cancellationToken: cancellationToken);
+        await BlockAndDeleteMessageAsync(message, botClient);
+        return true;
     }
     private static bool IsSpamming(Message message)
     {
@@ -66,7 +61,7 @@ internal abstract class UserCh {
     }
     private static async Task BlockAndDeleteMessageAsync(Message message, BotClient botClient)
     {
-        BlockUser(message.From.Id);
+        BlockUser(message.From!.Id);
         await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
         await botClient.SendMessageAsync(message.Chat.Id, "Ваше сообщение было удалено, и вы временно заблокированы");
     }
