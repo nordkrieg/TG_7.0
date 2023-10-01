@@ -71,11 +71,11 @@ public abstract class OthersMethods
             {
                 if (File.Exists($"{pt}{day}.{month}.{year}-1.jpg"))
                 {
-                    var fs_arr = new[] { new FileStream($"{pt}{day}.{month}.{year}-0.jpg", FileMode.Open, FileAccess.Read), new FileStream($"{pt}{day}.{month}.{year}-1.jpg", FileMode.Open, FileAccess.Read) };
-                    var br_arr = new[] { new BinaryReader(fs_arr[0]), new BinaryReader(fs_arr[1]) };
-                    var filebytes_arr = new[] { br_arr[0].ReadBytes((int)fs_arr[0].Length), br_arr[1].ReadBytes((int)fs_arr[1].Length) };
-                    var file1 = new InputFile(filebytes_arr[0], $"{pt}{day}.{month}.{year}-0.jpg");
-                    var file2 = new InputFile(filebytes_arr[1], $"{pt}{day}.{month}.{year}-1.jpg");
+                    var fsArr = new[] { new FileStream($"{pt}{day}.{month}.{year}-0.jpg", FileMode.Open, FileAccess.Read), new FileStream($"{pt}{day}.{month}.{year}-1.jpg", FileMode.Open, FileAccess.Read) };
+                    var brArr = new[] { new BinaryReader(fsArr[0]), new BinaryReader(fsArr[1]) };
+                    var filebytesArr = new[] { brArr[0].ReadBytes((int)fsArr[0].Length), brArr[1].ReadBytes((int)fsArr[1].Length) };
+                    var file1 = new InputFile(filebytesArr[0], $"{pt}{day}.{month}.{year}-0.jpg");
+                    var file2 = new InputFile(filebytesArr[1], $"{pt}{day}.{month}.{year}-1.jpg");
                     var files = new[]
                     {
                         new AttachedFile($"{pt}{day}.{month}.{year}-0.jpg", file1),
