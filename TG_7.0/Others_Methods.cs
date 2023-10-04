@@ -59,12 +59,14 @@ public abstract class OthersMethods
             if (day[0] == '0') day = day.TrimStart('0');
         }
         var pt = "../../../Fold_data/sch_fold/" + day + "." + month + "." + year + "/";
-        var temnMonth = month switch
-        {
-            "10" => "09",
-            "11" => "10",
-            _ => month
-        };
+        var temnMonth = month;
+            switch (month)
+            {
+                case "10":
+                    if (month == "10" && Convert.ToInt32(day) >= Convert.ToInt32("03")) temnMonth = "10";
+                    else temnMonth = "09";
+                    break;
+            }
         while (true)
         {
             if (Directory.Exists(pt))
