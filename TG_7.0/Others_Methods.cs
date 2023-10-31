@@ -1,13 +1,11 @@
 ﻿using PdfLibCore;
 using PdfLibCore.Enums;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.AvailableMethods;
 using File = System.IO.File;
 using Image = SixLabors.ImageSharp.Image;
 using InputFile = Telegram.BotAPI.AvailableTypes.InputFile;
-
 namespace TG_7._0;
 public abstract class OthersMethods
 {
@@ -24,22 +22,17 @@ public abstract class OthersMethods
             return false;
         }
     }
-    private static async Task DownLoad(string url, string path, DateTime date)
-    {
+    private static async Task DownLoad(string url, string path, DateTime date) {
         var day = date.DayOfYear.ToString();
         using var client = new HttpClient();
         var month = date.Month.ToString();
         if (Convert.ToInt32(month) < 10) _ = "0" + month;
         if (day[0] == '0')  _ = day.TrimStart('0');
-        if (await CheckUrl(url))
-        {
+        if (await CheckUrl(url)) {
             var fileBytes = await client.GetByteArrayAsync(url);
-            await File.WriteAllBytesAsync(path, fileBytes);
-        }
+            await File.WriteAllBytesAsync(path, fileBytes); }
     }
-
-    public static async Task Pari(BotClient botClient, CancellationToken cancellationToken, Message message, int x, string[] days)
-    {
+        public static async Task Pari(BotClient botClient, CancellationToken cancellationToken, Message message, int x, string[] days) {
         string day, month, year;
         var moscowTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
         if (days != null)
@@ -66,6 +59,8 @@ public abstract class OthersMethods
                     if (month == "10" && Convert.ToInt32(day) >= Convert.ToInt32("03")) temnMonth = "10";
                     else temnMonth = "09";
                     break;
+            case "11": temnMonth = "10";
+                break;
             }
         while (true)
         {
@@ -73,21 +68,20 @@ public abstract class OthersMethods
             {
                 if (File.Exists($"{pt}{day}.{month}.{year}-1.jpg"))
                 {
-                    var fs_arr = new[] { new FileStream($"{pt}{day}.{month}.{year}-0.jpg", FileMode.Open, FileAccess.Read), new FileStream($"{pt}{day}.{month}.{year}-1.jpg", FileMode.Open, FileAccess.Read) };
-                    var br_arr = new[] { new BinaryReader(fs_arr[0]), new BinaryReader(fs_arr[1]) };
-                    var filebytes_arr = new[] { br_arr[0].ReadBytes((int)fs_arr[0].Length), br_arr[1].ReadBytes((int)fs_arr[1].Length) };
-                    var file1 = new InputFile(filebytes_arr[0], $"{pt}{day}.{month}.{year}-0.jpg");
-                    var file2 = new InputFile(filebytes_arr[1], $"{pt}{day}.{month}.{year}-1.jpg");
-                    var files = new[]
-                    {
-                        new AttachedFile($"{pt}{day}.{month}.{year}-0.jpg", file1),
-                        new AttachedFile($"{pt}{day}.{month}.{year}-1.jpg", file2)
-                    };
-                    await botClient.SendMediaGroupAsync(message.Chat.Id, new[]
-                    {
-                        new InputMediaPhoto($"attach://{pt}{day}.{month}.{year}-0.jpg"), 
-                        new InputMediaPhoto($"attach://{pt}{day}.{month}.{year}-1.jpg")
-                    }, 
+                    var fs1 = new FileStream($"{pt}{day}.{month}.{year}-0.jpg", FileMode.Open, FileAccess.Read);
+                    var br1 = new BinaryReader(fs1);
+                    var filebytes1 = br1.ReadBytes((int)fs1.Length);
+                    var fs2 = new FileStream($"{pt}{day}.{month}.{year}-1.jpg", FileMode.Open, FileAccess.Read);
+                    var br2 = new BinaryReader(fs2);
+                    var filebytes2 = br2.ReadBytes((int)fs2.Length);
+                    var file1 = new InputFile(filebytes1, "odin.jpg");
+                    var file2 = new InputFile(filebytes2, "dva.jpg");
+                    var files = new[] {
+                        new AttachedFile("odin.jpg", file1),
+                        new AttachedFile("dva.jpg", file2) };
+                    await botClient.SendMediaGroupAsync(message.Chat.Id, new[] {
+                        new InputMediaPhoto("attach://odin.jpg"), 
+                        new InputMediaPhoto("attach://dva.jpg") }, 
                         attachedFiles: files, cancellationToken: cancellationToken);
                     break;
                 }
@@ -95,13 +89,11 @@ public abstract class OthersMethods
                 break;
             }
             var urlCheckResult = await CheckUrl($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf");
-            if (urlCheckResult)
-            {
+            if (urlCheckResult) {
                 Directory.CreateDirectory(pt);
                 await DownLoad($"https://mkeiit.ru/wp-content/uploads/{year}/{temnMonth}/{day}.{month}.{year}.pdf", $"{pt}{day}.{month}.{year}.pdf", moscowTime);
                 await ConvertPdFtoHojas($"{pt}", day, month, year);
-                continue;
-            }
+                continue; }
             await botClient.SendMessageAsync(message.Chat.Id, "Расписания на " + day + "." + month + "." + year + " нет", cancellationToken: cancellationToken);
             break;
         }
@@ -112,16 +104,12 @@ public abstract class OthersMethods
         using var pagesi = pdfDocument;
         for (var i = 0; i < pagesi.Pages.Count; i++)
         {
-            var pageWidth = pagesi.Pages[i].Size.Width;
-            var pageHeight = pagesi.Pages[i].Size.Height;
-            using var bitmap = new PdfiumBitmap((int)pageWidth, (int)pageHeight, false);
+            using var bitmap = new PdfiumBitmap((int)pagesi.Pages[i].Size.Width, (int)pagesi.Pages[i].Size.Height, false);
             pagesi.Pages[i].Render(bitmap, PageOrientations.Normal, RenderingFlags.LcdText);
             byte[] byteArray;
-            using (var memoryStream = new MemoryStream())
-            {
+            using (var memoryStream = new MemoryStream()) {
                 await bitmap.AsBmpStream(1 , 1).CopyToAsync(memoryStream);
-                byteArray = memoryStream.ToArray();
-            }
+                byteArray = memoryStream.ToArray(); }
             await File.WriteAllBytesAsync(path + day + "." + month + "." + year + $"-{i}.png", byteArray);
             var image1 = await Image.LoadAsync($"{path}{day}.{month}.{year}-{i}.png");
             var encoder = new JpegEncoder { Quality = 100 };
