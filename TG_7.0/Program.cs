@@ -1,27 +1,19 @@
-﻿using Telegram.BotAPI;
-using Telegram.BotAPI.AvailableMethods;
+﻿using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableMethods.FormattingOptions;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 using Telegram.BotAPI.UpdatingMessages;
 using BotClient = Telegram.BotAPI.BotClient;
 using File = System.IO.File;
-
 namespace TG_7._0;
     internal abstract class Program
     {
         private static readonly BotClient Bot = new("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
-
-        private static async Task Main()
-        {
+            private static async Task Main() {
             Console.WriteLine("Ужики я жив....");
             var cts = new CancellationTokenSource();
-            var cancellationToken = cts.Token;
-
-            while (true)
-            {
-                var updates = await Bot.GetUpdatesAsync();
-
+            while (true) {
+                var updates = await Bot.GetUpdatesAsync(); 
                 if (updates.Length > 0)
                 {
                     foreach (var update in updates)
@@ -29,24 +21,19 @@ namespace TG_7._0;
                         switch (update.Type)
                         {
                             case UpdateType.Message:
-                                await OnMessage(update.Message, cancellationToken);
+                                await OnMessage(update.Message, cts.Token);
                                 break;
                             case UpdateType.CallbackQuery:
-                                await OnCallbackQuery(update.CallbackQuery, Bot, cancellationToken);
+                                await OnCallbackQuery(update.CallbackQuery, Bot, cts.Token);
                                 break;
                         }
                     }
-
                     var maxUpdateId = updates.Max(u => u.UpdateId) + 1;
-                    await Bot.GetUpdatesAsync(offset: maxUpdateId, cancellationToken: cancellationToken);
+                    await Bot.GetUpdatesAsync(offset: maxUpdateId, cancellationToken: cts.Token);
                 }
-                else
-                {
-                    await Bot.GetUpdatesAsync();
-                }
+                else await Bot.GetUpdatesAsync();
             }
         }
-
         private static async Task OnMessage(Message message, CancellationToken cancellationToken)
         {
             var isHandled = await UserCh.Task(message, cancellationToken, Bot);
@@ -94,10 +81,12 @@ namespace TG_7._0;
                     break;
                 case "Расписание пар на определённый день":
                     await SendCalendar(message.Chat.Id, cancellationToken);
-                    break;
+                    break; 
+                case "halt":
+                    if (message.Chat.Id == 1079037911) Environment.Exit(0);
+                     break;
             }
         }
-
         private static async Task HandleStartCommand(long chatId, CancellationToken cancellationToken)
         {
             var keyboard = new ReplyKeyboardMarkup
@@ -147,10 +136,8 @@ namespace TG_7._0;
         private static async Task SendRandomImage(long chatId, string fileName, CancellationToken cancellationToken)
         {
             var x = new Random();
-            var rand = x.Next(1, 45);
-            var link = File.ReadLines($"../../../Fold_data/{fileName}").ElementAtOrDefault(rand);
-            if (link != null)
-                await Bot.SendPhotoAsync(chatId, link, caption: $"{rand}/45", cancellationToken: cancellationToken);
+            var link = File.ReadLines($"../../../Fold_data/{fileName}").ElementAtOrDefault(x.Next(1, 45));
+            if (link != null) await Bot.SendPhotoAsync(chatId, link, caption: $"{x.Next(1, 45)}/45", cancellationToken: cancellationToken);
         }
         private static async Task HandleRoflsCommand(long chatId, CancellationToken cancellationToken)
         {
@@ -212,15 +199,14 @@ namespace TG_7._0;
                         new KeyboardButton("Сообщить о баге"),
                         new KeyboardButton("Назад")
                     }
-                },
-                ResizeKeyboard = true
+                }, ResizeKeyboard = true
             };
             await Bot.SendMessageAsync(chatId, "OK", replyMarkup: keyboard, cancellationToken: cancellationToken);
         }
         private static async Task SendCalendar(long chatId, CancellationToken cancellationToken)
         {
             var rm = new InlineKeyboardMarkup { InlineKeyboard = CreateCalendar(2023) };
-            await Bot.SendMessageAsync(chatId, "🗓 <b>Telegram Bot Calendar</b> 🗓", parseMode: ParseMode.HTML, replyMarkup: rm, cancellationToken: cancellationToken);
+            await Bot.SendMessageAsync(chatId, "ОК", parseMode: ParseMode.HTML, replyMarkup: rm, cancellationToken: cancellationToken);
         }
     private static async Task OnCallbackQuery(CallbackQuery query, BotClient bot, CancellationToken cancellationToken)
     {
@@ -230,10 +216,7 @@ namespace TG_7._0;
         {
             case "month":
                 var month = new Month((MonthName)Enum.Parse(typeof(MonthName), cbargs[2]), uint.Parse(cbargs[1]));
-                var mkeyboard = new InlineKeyboardMarkup
-                {
-                    InlineKeyboard = CreateCalendar(month)
-                };
+                var mkeyboard = new InlineKeyboardMarkup { InlineKeyboard = CreateCalendar(month) };
                 Bot.EditMessageReplyMarkup<Message>(new EditMessageReplyMarkup
                 {
                     ChatId = query.Message.Chat.Id,
@@ -242,10 +225,7 @@ namespace TG_7._0;
                 });
                 break;
             case "year":
-                var ykeyboard = new InlineKeyboardMarkup
-                {
-                    InlineKeyboard = CreateCalendar(uint.Parse(cbargs[1]))
-                };
+                var ykeyboard = new InlineKeyboardMarkup{ InlineKeyboard = CreateCalendar(uint.Parse(cbargs[1])) };
                 Bot.EditMessageReplyMarkup<Message>(new EditMessageReplyMarkup
                 {
                     ChatId = query.Message.Chat.Id,
@@ -262,16 +242,10 @@ namespace TG_7._0;
     {
         var calendar = new InlineKeyboardButton[mon.Weeks + 3][];
         var pos = 0;
-        calendar[0] = new InlineKeyboardButton[1]
-        {
-            InlineButtonBuilder.SetCallbackData($"{mon.Name} {mon.Year}", $"year {mon.Year}")
-        };
-        var days = new[] { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" };
+        calendar[0] = new InlineKeyboardButton[1] { InlineButtonBuilder.SetCallbackData($"{mon.Name} {mon.Year}", $"year {mon.Year}") };
+        var days = new[] { "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс" };
         calendar[1] = new InlineKeyboardButton[7];
-        for (var i = 0; i < 7; i++)
-        {
-            calendar[1][i] = InlineButtonBuilder.SetCallbackData(days[i], $"{((DayName)i)}");
-        }
+        for (var i = 0; i < 7; i++) calendar[1][i] = InlineButtonBuilder.SetCallbackData(days[i], $"{((DayName)i)}");
         for (var i = 2; i < mon.Weeks + 2; i++)
         {
             calendar[i] = new InlineKeyboardButton[7];
@@ -288,15 +262,9 @@ namespace TG_7._0;
                         );
                         pos++;
                     }
-                    else
-                    {
-                        calendar[i][j] = InlineButtonBuilder.SetCallbackData("*", "Empty day");
-                    }
+                    else calendar[i][j] = InlineButtonBuilder.SetCallbackData("*", "Empty day");
                 }
-                else
-                {
-                    calendar[i][j] = InlineButtonBuilder.SetCallbackData("*", "Empty day");
-                }
+                else calendar[i][j] = InlineButtonBuilder.SetCallbackData("*", "Empty day");
             }
         }
         calendar[^1] = new InlineKeyboardButton[2];
@@ -397,8 +365,7 @@ public class Month
         firstday += month < 10 ? 0 : 31;
         firstday += month < 11 ? 0 : 30;
         firstday %= 7;
-        for (int i = 0; i < Days.Length; i++)
-            Days[i] = new Day((DayName)((i + firstday) % 7), (ushort)(i + 1));
+        for (var i = 0; i < Days.Length; i++)  Days[i] = new Day((DayName)((i + firstday) % 7), (ushort)(i + 1));
     }
     public uint Year { get; }
     public MonthName Name { get; }

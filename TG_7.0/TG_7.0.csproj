@@ -22,4 +22,8 @@
     <Folder Include="Fold_data\sch_fold\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Telegram.BotAPI" />
+  </ItemGroup>
+
 </Project>
