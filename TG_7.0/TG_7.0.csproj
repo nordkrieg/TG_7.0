@@ -9,11 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="Freeware.Pdf2Png" Version="1.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.13" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="PdfLibCore" Version="2.5.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />
     <PackageReference Include="telegram.bot" Version="19.0.0" />
-    <PackageReference Include="Telegram.BotAPI" Version="6.9.0" />
+    <PackageReference Include="Telegram.BotAPI" Version="6.9.2" />
     <PackageReference Include="Telegram.Bots.Extensions.Polling" Version="5.9.0" />
     
   </ItemGroup>

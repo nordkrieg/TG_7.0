@@ -3,7 +3,7 @@ using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.UpdatingMessages;
 namespace TG_7._0;
-internal abstract class UserCh { 
+internal abstract class SpamBlock { 
     private static readonly HashSet<int> BannedUserIds = new() { 626421947, 917027444};
     private static readonly ConcurrentDictionary<long, Queue<DateTime>> MessageTimes = new();
     private const int MaxMessageCount = 5;
