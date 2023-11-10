@@ -1,4 +1,5 @@
-﻿using Telegram.BotAPI.AvailableMethods;
+﻿using System.Globalization;
+using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableMethods.FormattingOptions;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
@@ -9,10 +10,11 @@ namespace TG_7._0;
 internal abstract class Program
     {
         private static readonly BotClient Bot = new("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
-            private static async Task Main() {
-            Console.WriteLine("Ужики я жив....");
-            var cts = new CancellationTokenSource();
-            while (true) {
+            private static async Task Main() { 
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException; 
+                Console.WriteLine("Ужики я жив....");
+        var cts = new CancellationTokenSource(); 
+                while (true) {
                 var updates = await Bot.GetUpdatesAsync(); 
                 if (updates.Length > 0)
                 {
@@ -248,6 +250,15 @@ internal abstract class Program
             InlineButtonBuilder.SetCallbackData($"{year + 1}",$"year {year + 1}")
         };
         return keyboard;
+    }
+    private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        var ex = (Exception)e.ExceptionObject;
+
+        using var writer = new StreamWriter("ErrorLog.txt", true);
+        writer.WriteLine("Message :" + ex.Message + "<br/>" + Environment.NewLine + "StackTrace :" + ex.StackTrace +
+                         "" + Environment.NewLine + "Date :" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
+        writer.WriteLine(Environment.NewLine + "-----------------------------------------------------------------------------" + Environment.NewLine);
     }
 }
 public enum DayName

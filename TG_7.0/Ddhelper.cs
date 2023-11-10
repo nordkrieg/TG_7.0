@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using Telegram.BotAPI.AvailableTypes;
 namespace TG_7._0;
-
 internal abstract class Ddhelper
 {
     public static async Task Dbreq(Message message, CancellationToken cancellationToken)
@@ -49,4 +48,3 @@ internal abstract class Ddhelper
         public string? Req { get; set; }
     }
 }
-
