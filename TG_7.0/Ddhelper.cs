@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#nullable enable
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using Telegram.BotAPI.AvailableTypes;
 namespace TG_7._0;
@@ -8,8 +9,8 @@ internal abstract class Ddhelper
     {
         var moscowTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
         await using var db = new ApplicationContext();
-        var existingRequestTask = db.Requests.FirstOrDefaultAsync(r => r.IDChat == message.Chat.Id, cancellationToken: cancellationToken);
-        if (existingRequestTask != null)
+        var existingRequestTask = db.Requests.FirstOrDefaultAsync(r => r.IdChat == message.Chat.Id, cancellationToken: cancellationToken);
+        if (existingRequestTask.Result != null)
         {
             var existingRequest = await existingRequestTask;
             existingRequest.Login = message.Chat.Username;
@@ -22,7 +23,7 @@ internal abstract class Ddhelper
         {
             var newRequest = new Request
             {
-                IDChat = message.Chat.Id,
+                IdChat = message.Chat.Id,
                 Login = message.Chat.Username,
                 Name = message.Chat.FirstName,
                 Surnameame = message.Chat.LastName,
@@ -40,7 +41,7 @@ internal abstract class Ddhelper
     public class Request
     {
         [Key]
-        public long IDChat { get; set; }
+        public long IdChat { get; set; }
         public string? Login { get; set; }
         public string? Name { get; set; }
         public string? Surnameame { get; set; }
