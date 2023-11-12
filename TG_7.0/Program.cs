@@ -8,14 +8,19 @@ using BotClient = Telegram.BotAPI.BotClient;
 using File = System.IO.File;
 namespace TG_7._0;
 internal abstract class Program
+{
+    private static readonly BotClient Bot = new("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
+    private static async Task Main()
     {
-        private static readonly BotClient Bot = new("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
-            private static async Task Main() { 
-                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException; 
-                Console.WriteLine("Ужики я жив....");
-        var cts = new CancellationTokenSource(); 
-                while (true) {
-                var updates = await Bot.GetUpdatesAsync(); 
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        Console.WriteLine("Ужики я жив....");
+        var cts = new CancellationTokenSource();
+
+        while (!cts.Token.IsCancellationRequested)
+        {
+            try
+            {
+                var updates = await Bot.GetUpdatesAsync();
                 if (updates.Length > 0)
                 {
                     foreach (var update in updates)
@@ -35,8 +40,17 @@ internal abstract class Program
                 }
                 else await Bot.GetUpdatesAsync();
             }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("Запрос был отменен из-за истечения времени ожидания.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Произошла ошибка: {ex.Message}");
+            }
         }
-        private static async Task OnMessage(Message message, CancellationToken cancellationToken)
+    }
+private static async Task OnMessage(Message message, CancellationToken cancellationToken)
         {
             var isHandled = await SpamBlock.Task(message, cancellationToken, Bot);
             if (isHandled) return;
