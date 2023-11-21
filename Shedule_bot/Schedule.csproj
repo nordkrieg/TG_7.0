@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Schedule</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>8d6d16be-b4fe-49cb-a01c-187676ebd1e5</UserSecretsId>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AssemblyName>Schedule</AssemblyName>
+    <BaseOutputPath>D:\123</BaseOutputPath>
+    <BaseIntermediateOutputPath>D:\123\obj</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="obj\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <None Remove="obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="5.7.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Freeware.Pdf2Png" Version="1.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="PdfLibCore" Version="2.5.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />
+    <PackageReference Include="telegram.bot" Version="19.0.0" />
+    <PackageReference Include="Telegram.BotAPI" Version="6.9.2" />
+    <PackageReference Include="Telegram.Bots.Extensions.Polling" Version="5.9.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Fold_data\sch_fold\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Telegram.BotAPI" />
+  </ItemGroup>
+
+</Project>
