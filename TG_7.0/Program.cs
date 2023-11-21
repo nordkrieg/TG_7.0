@@ -1,4 +1,5 @@
-﻿using Telegram.BotAPI.AvailableMethods;
+﻿using System.Globalization;
+using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableMethods.FormattingOptions;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
@@ -6,14 +7,20 @@ using Telegram.BotAPI.UpdatingMessages;
 using BotClient = Telegram.BotAPI.BotClient;
 using File = System.IO.File;
 namespace TG_7._0;
-    internal abstract class Program
+internal abstract class Program
+{
+    private static readonly BotClient Bot = new("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
+    private static async Task Main()
     {
-        private static readonly BotClient Bot = new("6348440231:AAFO28UNHkVkNAw6JQ5kKg8_kdeo-7MjCsE");
-            private static async Task Main() {
-            Console.WriteLine("Ужики я жив....");
-            var cts = new CancellationTokenSource();
-            while (true) {
-                var updates = await Bot.GetUpdatesAsync(); 
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        Console.WriteLine("Ужики я жив....");
+        var cts = new CancellationTokenSource();
+
+        while (!cts.Token.IsCancellationRequested)
+        {
+            try
+            {
+                var updates = await Bot.GetUpdatesAsync();
                 if (updates.Length > 0)
                 {
                     foreach (var update in updates)
@@ -33,60 +40,37 @@ namespace TG_7._0;
                 }
                 else await Bot.GetUpdatesAsync();
             }
-        }
-        private static async Task OnMessage(Message message, CancellationToken cancellationToken)
-        {
-            var isHandled = await UserCh.Task(message, cancellationToken, Bot);
-            if (isHandled) return;
-            var moscowTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
-            Console.WriteLine($"User: {message.Chat.Username}\n" + $"Name: {message.Chat.FirstName}\n" + $"Surnameame: {message.Chat.LastName}\n" +
-                              $"ID Chat: {message.Chat.Id}\n" + $"Time: {moscowTime}\n" + $"Text: {message.Text}\n");
-            switch (message.Text)
+            catch (TaskCanceledException)
             {
-                case "/start":
-                    await HandleStartCommand(message.Chat.Id, cancellationToken);
-                    break;
-                case "Расписание звонков":
-                    await SendCallSchedule(message.Chat.Id, cancellationToken);
-                    break;
-                case "Расписание пар":
-                    await HandleScheduleCommand(message.Chat.Id, cancellationToken);
-                    break;
-                case "Пары на завтра":
-                    await OthersMethods.Pari(Bot, cancellationToken, message, 1, null);
-                    break;
-                case "Пары на сегодня":
-                    await OthersMethods.Pari(Bot, cancellationToken, message, 0, null);
-                    break;
-                case "Капибара":
-                    await SendRandomImage(message.Chat.Id, "LinkCapybara.txt", cancellationToken);
-                    break;
-                case "Шлёпа":
-                    await SendRandomImage(message.Chat.Id, "LinkBigRussianCat.txt", cancellationToken);
-                    break;
-                case "Рофлс":
-                    await HandleRoflsCommand(message.Chat.Id, cancellationToken);
-                    break;
-                case "Назад":
-                    await HandleBackCommand(message.Chat.Id, cancellationToken);
-                    break;
-                case "Поддержка":
-                    await SendSupportInfo(message.Chat.Id, cancellationToken);
-                    break;
-                case "Сообщить о баге":
-                    await SendBugReportInfo(message.Chat.Id, cancellationToken);
-                    break;
-                case "Инфа":
-                    await HandleInfoCommand(message.Chat.Id, cancellationToken);
-                    break;
-                case "Расписание пар на определённый день":
-                    await SendCalendar(message.Chat.Id, cancellationToken);
-                    break; 
-                case "halt":
-                    if (message.Chat.Id == 1079037911) Environment.Exit(0);
-                     break;
+                Console.WriteLine("Запрос был отменен из-за истечения времени ожидания.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Произошла ошибка: {ex.Message}");
             }
         }
+    }
+private static async Task OnMessage(Message message, CancellationToken cancellationToken)
+        {
+            var isHandled = await SpamBlock.Task(message, cancellationToken, Bot);
+            if (isHandled) return;
+            await Ddhelper.Dbreq(message, cancellationToken); 
+            var commands = new Dictionary<string, Func<long, CancellationToken, Task>> {
+            { "/start", HandleStartCommand },
+            { "Расписание звонков", SendCallSchedule },
+            { "Расписание пар", HandleScheduleCommand },
+            { "Пары на завтра", (id, token) => WebService.Pari(Bot, token, message, 1, null) },
+            { "Пары на сегодня", (id, token) => WebService.Pari(Bot, token, message, 0, null) },
+            { "Капибара", (id, token) => SendRandomImage(id, "LinkCapybara.txt", token) },
+            { "Шлёпа", (id, token) => SendRandomImage(id, "LinkBigRussianCat.txt", token) },
+            { "Рофлс", HandleRoflsCommand },
+            { "Назад", HandleStartCommand },
+            { "Поддержка", SendSupportInfo },
+            { "Сообщить о баге", SendBugReportInfo },
+            { "Инфа", HandleInfoCommand },
+            { "Расписание пар на определённый день", SendCalendar },
+            { "halt", (id, token) => { if (id == 1079037911) Environment.Exit(0); return Task.CompletedTask; } } };
+            if (commands.TryGetValue(message.Text, out var command)) await command(message.Chat.Id, cancellationToken); }
         private static async Task HandleStartCommand(long chatId, CancellationToken cancellationToken)
         {
             var keyboard = new ReplyKeyboardMarkup
@@ -156,27 +140,6 @@ namespace TG_7._0;
             };
             await Bot.SendMessageAsync(chatId, "несмешно", replyMarkup: keyboard, cancellationToken: cancellationToken);
         }
-        private static async Task HandleBackCommand(long chatId, CancellationToken cancellationToken)
-        {
-            var keyboard = new ReplyKeyboardMarkup
-            {
-                Keyboard = new[]
-                {
-                    new[]
-                    {
-                        new KeyboardButton("Расписание пар"),
-                        new KeyboardButton("Инфа")
-                    },
-                    new[]
-                    {
-                        new KeyboardButton("Расписание звонков"),
-                        new KeyboardButton("Рофлс")
-                    }
-                },
-                ResizeKeyboard = true
-            };
-            await Bot.SendMessageAsync(chatId, "OK", replyMarkup: keyboard, cancellationToken: cancellationToken);
-        }
         private static async Task SendSupportInfo(long chatId, CancellationToken cancellationToken)
         {
             const string supportInfo = "Поддержать разработчика: \n\n" + "СберБанк: `5469 4100 1429 4908`\n" + "ВТБ: `2200 2460 4327 6560`\n\n";
@@ -234,7 +197,7 @@ namespace TG_7._0;
                 });
                 break;
             case "day":
-                await OthersMethods.Pari(bot, cancellationToken, query.Message, 0, cbargs);
+                await WebService.Pari(bot, cancellationToken, query.Message, 0, cbargs);
                 break;
         }
     }
@@ -245,7 +208,7 @@ namespace TG_7._0;
         calendar[0] = new InlineKeyboardButton[1] { InlineButtonBuilder.SetCallbackData($"{mon.Name} {mon.Year}", $"year {mon.Year}") };
         var days = new[] { "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс" };
         calendar[1] = new InlineKeyboardButton[7];
-        for (var i = 0; i < 7; i++) calendar[1][i] = InlineButtonBuilder.SetCallbackData(days[i], $"{((DayName)i)}");
+        for (var i = 0; i < 7; i++) calendar[1][i] = InlineButtonBuilder.SetCallbackData(days[i], $"{(DayName)i}");
         for (var i = 2; i < mon.Weeks + 2; i++)
         {
             calendar[i] = new InlineKeyboardButton[7];
@@ -272,8 +235,8 @@ namespace TG_7._0;
         var nextmonth = mon.Name == MonthName.December ? MonthName.January : mon.Name + 1;
         var previousyear = previousmonth == MonthName.December ? mon.Year - 1 : mon.Year;
         var nextyear = nextmonth == MonthName.January ? mon.Year + 1 : mon.Year;
-        calendar[^1][0] = InlineButtonBuilder.SetCallbackData($"{previousmonth}", $"month {previousyear} {((ushort)previousmonth)}");
-        calendar[^1][1] = InlineButtonBuilder.SetCallbackData($"{nextmonth}", $"month {nextyear} {((ushort)nextmonth)}");
+        calendar[^1][0] = InlineButtonBuilder.SetCallbackData($"{previousmonth}", $"month {previousyear} {(ushort)previousmonth}");
+        calendar[^1][1] = InlineButtonBuilder.SetCallbackData($"{nextmonth}", $"month {nextyear} {(ushort)nextmonth}");
 
         return calendar;
     }
@@ -301,6 +264,15 @@ namespace TG_7._0;
             InlineButtonBuilder.SetCallbackData($"{year + 1}",$"year {year + 1}")
         };
         return keyboard;
+    }
+    private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        var ex = (Exception)e.ExceptionObject;
+
+        using var writer = new StreamWriter("ErrorLog.txt", true);
+        writer.WriteLine("Message :" + ex.Message + "<br/>" + Environment.NewLine + "StackTrace :" + ex.StackTrace +
+                         "" + Environment.NewLine + "Date :" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
+        writer.WriteLine(Environment.NewLine + "-----------------------------------------------------------------------------" + Environment.NewLine);
     }
 }
 public enum DayName
@@ -346,15 +318,15 @@ public class Month
         var leapyear = Year % 4 == 0;
         var days = Name switch
         {
-            MonthName.February => (leapyear ? 29 : 28),
+            MonthName.February => leapyear ? 29 : 28,
             MonthName.April or MonthName.June or MonthName.September or MonthName.November => 30,
             _ => 31
         };
         Days = new Day[days];
-        var firstday = year * 365 + (leapyear ? -1 : 0) + (((year - (year % 4)) / 4)) - (((year - (year % 400)) / 400)) + 3;
+        var firstday = year * 365 + (leapyear ? -1 : 0) + (year - year % 4) / 4 - (year - year % 400) / 400 + 3;
         var month = (int)monthName;
         firstday += month < 1 ? 0 : 31;
-        firstday += month < 2 ? 0 : (leapyear ? 29 : 28);
+        firstday += month < 2 ? 0 : leapyear ? 29 : 28;
         firstday += month < 3 ? 0 : 31;
         firstday += month < 4 ? 0 : 30;
         firstday += month < 5 ? 0 : 31;
@@ -375,7 +347,7 @@ public class Month
         get
         {
             var days = (int)Days[0].Name + Days.Length - 1;
-            return (ushort)(((days - (days % 7)) / 7) + (days % 7 > 0 ? 1 : 0));
+            return (ushort)((days - days % 7) / 7 + (days % 7 > 0 ? 1 : 0));
         }
     }
 }
